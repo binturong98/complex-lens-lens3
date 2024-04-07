@@ -25,6 +25,8 @@ library(reshape2)
 library(grid)
 library(gridExtra)
 library(plotly)
+library(ggpubr)
+library(rstatix)
 ```
 
 # Data and subsetting
@@ -131,12 +133,6 @@ LE1_image_size_plot <- hang_data %>%
   
 LE1_image_size_plot
 
-
-
-# Figures
-
-## Ophthalmoscope
-
 ```{r right and left combined boxplots}
 
 ## DO NOT USE - see below
@@ -161,6 +157,13 @@ E1_oph
 ```
 
 ^Not using these as the analyses don't combine left and right eyes (that becomes pseudo-replication!)
+
+
+
+
+# Figures
+
+## Ophthalmoscope
 
 ```{r individual eye boxplots}
 
@@ -679,7 +682,6 @@ total_strikes_horizontal
 ## Vertical arena
 
 # missed strikes
-missed_strikes_vertical
 missed_strikes_vertical <- behaviour_data %>%
   filter(arena == "vertical" & light_environment == "normal") %>%
   ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
@@ -958,16 +960,57 @@ dark_total_strikes_vertical
 # Statistics
 ```{r ophthalmoscope stats}
 
+## Test for normality
+
+# Building the linear model
+oph_model <- lm(bestimagereciprocal ~ probe, data = oph_data)
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(oph_model))
+
 # Test for normality
-shapiro.test(oph_data$bestimagereciprocal)
+shapiro_test(residuals(oph_model))
+# p < 0.05 so can't assume normality
+
+# Checking normality assumption by groups
+oph_data %>%
+  group_by(probe) %>%
+  shapiro_test(bestimagereciprocal)
+# again p < 0.05 so can't assume normality
+
+# Creating QQ plots for each group level
+ggqqplot(oph_data, "bestimagereciprocal", facet.by = "probe")
+# Probe 2 (lens3_249) is the only one that looks normal. Other two are kinda wonky
+
+# Using a Kruskal-Wallis test
+res_oph_kw <- compare_means(bestimagereciprocal ~ probe, data = oph_data, 
+              group.by = "eye", method = 'kruskal.test')
+res_oph_kw
+# No significant changes in focused state with lens3 knockdown - all eyes
 
 ```
 
-Can't really use the following code because treating the left and right eyes as individual data points would be pseudo-replication...
+```{r edge sharpness stats}
 
-oph_test <- oph_data %>%
-  filter(probe != "lens3_191") %>%
-  filter(eye == "LE1" | eye == "RE1") 
+# Building linear models for each curve 
 
-t.test(oph_test$bestimagereciprocal ~ oph_test$probe)  
+#  
+cmod<-lm(contrast ~ distance*factor(eye_probe), data=edge_data)
+
+# LE2
+edge_model_control_LE2 <- lm(contrast ~ distance,
+                             data = edge_data,
+                             subset = eye_probe == "LE2_control")
+
+edge_model_249_LE2 <- lm(contrast ~ distance,
+                             data = edge_data,
+                             subset = eye_probe == "LE2_lens3_249")
+
+edge_model_191_LE2 <- lm(contrast ~ distance,
+                             data = edge_data,
+                             subset = eye_probe == "LE2_lens3_191")
+
+anova(edge_model_control_LE2, edge_model_191_LE2, edge_model_191_LE2)
+
+```
 
