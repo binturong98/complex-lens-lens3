@@ -1,0 +1,973 @@
+---
+title: "Deconstructing a Complex Lens - Functional implications of key lens protein knockdown in *Thermonectus marmoratus*"
+authors: "Mitra AT., Rathore S., Jester A., Hyland-Brown R., Benoit JB., Stowasser A, Tomoyasu Y., Buschbeck EK."
+date: "7 April 2024"
+output:
+  html_document:
+    
+    theme: flatly
+    toc: TRUE
+    toc_float: TRUE
+    code_fold: hide
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+
+# Markdown settings
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.height = 6, fig.width = 8, attr.output='style="max-height: 400px;"') 
+
+# Load packages
+library(tidyverse)
+library(cowplot)
+library(reshape2)
+library(grid)
+library(gridExtra)
+library(plotly)
+```
+
+# Data and subsetting
+
+## Raw data
+
+Raw data files for the ophthalmoscope, edge sharpness and focal length contain one row for **each eye** sampled. For most individuals, there are four rows of data: Right eye 1 & eye 2 and left eye 1 & eye 2. 
+
+Raw data file for behaviour contains data from both the optimal and challenging light arenas.
+
+Not using lens3_hanging_drops.csv as this was the first set of data that were collected. The images are overexposed and positioning isnt' quite right. This makes focal length estimation unreliable.
+
+```{r loading data}
+
+# Load raw data
+
+# Ophthalmoscope
+oph_data <- read.csv("lens3_ophthalmoscope.csv", header = TRUE)
+
+# Hanging drops
+edge_data <- read.csv("edge_sharpness_long.csv", header = TRUE)
+
+focal_data <- read.csv("back_focal_length.csv", header = TRUE)
+
+# Behaviour
+behaviour_data <- read.csv("lens3_behaviour.csv", header = TRUE)
+
+# na.strings converts "NA", "" and " " into na within the body of the file
+```
+
+#---- Unused plots & analyses
+
+
+Calculating focal length
+
+Focal length can be estimated in two ways. The first is a calculation of effective focal length (F)- 
+1) F = (image size / object size) * object distance
+The effective focal length is an opitcal measurement given as the distance from a principal plane of an optical lens to its imaging plane - Edmund Optics
+
+The second is a calculation of back focal length (BFL) -
+2) BFL = (best object image# - best back surface of lens image#) * 5 * 1.33
+Multiplying by 5 because the images are taken at 5 um increments. 1.33 is the refractive index of water because these lenses view in water and are thus suspended in water for the hanging drop.
+The back focal length is a mechanical measurement given as the distance between the last surface of an optical lens to its image plane.
+
+Instead of picking the best focused image manually, back focal length can be estimated from the MATLAB code written by Annette in her current biology bifocal lens paper. This is arguably a more accurate and less biased way of estimating focal length.  
+
+This is especially because lens3 RNAi causes cataracts which form blurry images which makes it really hard to pick out the best focused image manually. The code also captures that blurriness in the form of low image contrast curves. 
+Calculating difference in size between the first and second images for each eye for each larva. 
+
+From micrometer slide measured on the 20x objective, 100 um = 151.037 pixels so
+pixel_size <- (100/151.037) = 0.6620894
+
+Calculating image size in  um
+  hang_data <- hang_data %>% 
+  mutate(image_1_size = (image_1_size_pixels * pixel_size),
+         image_2_size = (image_2_size_pixels * pixel_size)) 
+ 
+Size of grating in um
+  object_size <- 10000
+ 
+Distance between grating and lens in um
+  object_distance <- 125000
+  
+Focal length in um
+hang_data <- hang_data %>%
+  mutate(focal_length_1 = ((image_1_size/object_size)*object_distance),
+         focal_length_2 = ((image_1_size/object_size)*object_distance))
+
+Calculating difference in image size
+hang_data <- hang_data %>%
+  mutate(image_size_diff = (image_2_size - image_1_size))
+
+
+Visualising differences in focal length between groups. These are per image and per eye.
+
+Left Eye 1
+
+LE1 Image 1
+LE1_image1_plot <- hang_data %>%
+  filter(eye == "LE1") %>%
+  ggplot(aes(y= focal_length_1, x = group, fill = group)) +
+  geom_violin(trim = FALSE, alpha = 0.7) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+  labs(title=NULL,x="Left Eye 1: Image 1", y = "Focal length (um)") +
+  scale_x_discrete(labels = c('Control', "lens3 Injected")) +
+  geom_boxplot(width=0.15, fill="white", outlier.alpha = 0)+
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(text = element_text(size = rel(4)), legend.position = "none")
+  
+LE1_image1_plot
+
+LE1_image_size_plot <- hang_data %>%
+  filter(eye == "LE1") %>%
+  ggplot(aes(y= image_size_diff, x = group, fill = group)) +
+  geom_violin(trim = FALSE, alpha = 0.7) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+  labs(title=NULL,x="Left Eye 1", y = "Difference in image size") +
+  scale_x_discrete(labels = c('Control', "lens3 Injected")) +
+  geom_boxplot(width=0.15, fill="white", outlier.alpha = 0)+
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(text = element_text(size = rel(4)), legend.position = "none")
+  
+LE1_image_size_plot
+
+
+
+# Figures
+
+## Ophthalmoscope
+
+```{r right and left combined boxplots}
+
+## DO NOT USE - see below
+
+#E1: both probes vs controls
+E1_oph <- oph_data %>%
+  filter(eye == "LE1" | eye == "RE1") %>%
+  ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  labs(title=NULL,x="Eye 1", y = "Object distance (mm)") +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+E1_oph
+```
+
+^Not using these as the analyses don't combine left and right eyes (that becomes pseudo-replication!)
+
+```{r individual eye boxplots}
+
+#LE1
+LE1_oph <- oph_data %>%
+  filter(eye == "LE1") %>%
+  ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  labs(title=NULL,x="Left Eye 1", y = "Object distance (mm)") +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+LE1_oph
+
+#LE2
+LE2_oph <- oph_data %>%
+  filter(eye == "LE2") %>%
+  ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  labs(title=NULL,x="Left Eye 2", y = "Object distance (mm)") +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+LE2_oph
+
+#RE1
+RE1_oph <- oph_data %>%
+  filter(eye == "RE1") %>%
+  ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  labs(title=NULL,x="Right Eye 1", y = "Object distance (mm)") +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+RE1_oph
+
+#RE2
+
+RE2_oph <- oph_data %>%
+  filter(eye == "RE2") %>%
+  ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = 17, outlier.size = 2, position = "dodge2") + # Changing outlier shape
+  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  labs(title=NULL,x="Right Eye 2", y = "Object distance (mm)") +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+  geom_jitter(shape = 19, size = 2.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+RE2_oph
+
+# Making the individual boxes narrow and putting them next to each other like the osmosis paper figures
+
+# Creating new column with the eye and probe identity to make this easier. Might be a better way to do this?
+oph_data <- oph_data %>%
+  mutate(eye_probe = paste(eye, probe, sep="_"))
+
+# Reordering factors so control and probe boxes are grouped together
+oph_data$eye_probe <- factor(oph_data$eye_probe,
+                          c("LE1_control", "RE1_control", "LE2_control", "RE2_control", "LE1_lens3_191", "RE1_lens3_191", "LE2_lens3_191", "RE2_lens3_191", "LE1_lens3_249", "RE1_lens3_249", "LE2_lens3_249", "RE2_lens3_249"))
+
+# Plot for all E1s
+
+E1_LR_oph <- oph_data %>%
+  filter(grepl('E1', eye)) %>% #grepl stands for grep logical. It is a funciton that searches for matches or a string or a string vector
+  ggplot(aes(y= bestimagereciprocal, x = eye_probe, fill = eye_probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#009E73", "#E69F00",  "#E69F00", "#D55E00", "#D55E00")) +
+  labs(title=NULL,x="Eye 1", y = "Object distance (mm)") +
+  scale_x_discrete(labels = c('Left', 'Right', 'Left', 'Right', 'Left', 'Right')) +
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+E1_LR_oph 
+
+# Trying custom facet grid labels and using the labeller function
+probe.labs <- c("control" = "Control","lens3_191" = "Probe 1", "lens3_249" = "Probe 2")
+
+# Trying to make multilevel x-axes
+
+E1_LR_oph <- E1_LR_oph + facet_grid(~ probe, scales = "free", labeller = labeller(probe = probe.labs)) 
+
+# Changing text size of facet grid labels
+E1_LR_oph <- E1_LR_oph + theme(strip.text.x = element_text(size = 20, face = "bold"))
+
+# Customising facet appearance
+E1_LR_oph <- E1_LR_oph + theme(strip.background = element_rect(size = 1.5, linetype = "solid"))
+
+E1_LR_oph
+
+# Plot for all E2s
+
+E2_LR_oph <- oph_data %>%
+  filter(grepl('E2', eye)) %>% #grepl stands for grep logical. It is a funciton that searches for matches or a string or a string vector
+  ggplot(aes(y= bestimagereciprocal, x = eye_probe, fill = eye_probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#009E73", "#E69F00", "#E69F00", "#D55E00", "#D55E00")) +
+  labs(title=NULL,x="Eye 2", y = "Object distance (mm)") +
+  scale_x_discrete(labels = c('Left', 'Right', 'Left', 'Right', 'Left', 'Right')) +
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+E2_LR_oph 
+
+# Trying custom facet grid labels and using the labeller function
+probe.labs <- c("control" = "Control","lens3_191" = "Probe 1", "lens3_249" = "Probe 2")
+
+# Trying to make multilevel x-axes
+
+E2_LR_oph <- E2_LR_oph + facet_grid(~ probe, scales = "free", labeller = labeller(probe = probe.labs)) 
+
+# Changing text size of facet grid labels
+E2_LR_oph <- E2_LR_oph + theme(strip.text.x = element_text(size = 20, face = "bold"))
+
+# Customising facet appearance
+E2_LR_oph <- E2_LR_oph + theme(strip.background = element_rect(size = 1.5, linetype = "solid"))
+
+E2_LR_oph
+
+```
+
+```{r ophthalmoscope figure}
+#make panels 
+fig.a <- E1_LR_oph +
+theme(legend.position = "none")
+
+fig.a
+
+fig.b <- E2_LR_oph +
+theme(legend.position = "none") +
+  labs(y = NULL) + #removes y axis label
+  guides(y = "none") #removes y axis line and numbers
+
+fig.b
+
+#use cowplot package to nicely plot the graphs together with a shared common legend.
+wide_plot <- plot_grid(fig.a, NULL, fig.b, 
+                   #list of plots to arrange in grid
+                   rel_widths = c(6, 0.2, 6),
+                   align = "h",
+                   nrow = 1)
+
+plot_grid(wide_plot)
+
+#print graph
+pdf(file = "Figures/ophthalmoscope_wide.pdf", width = 12,  height = 6)
+wide_plot
+dev.off()
+
+# stacking the plots on top of each other instead of putting them side to side
+fig.a <- E1_LR_oph +
+theme(legend.position = "none",
+      axis.title.y = element_blank())
+
+fig.a
+
+fig.b <- E2_LR_oph +
+theme(legend.position = "none",
+      strip.text.x = element_blank())+ #removing facet_grid second x axis label
+  labs(y = NULL)
+
+fig.b
+
+#combining plots
+
+long_plot <- plot_grid(fig.a, fig.b,
+                       nrow = 2)
+plot_grid(long_plot)
+
+#creating common y axis label
+y.grob <- textGrob("Object distance (mm)", 
+                   gp = gpar(fontface = "bold",
+                             fontsize = 30), rot = 90)
+
+#print graph
+pdf(file = "Figures/ophthalmoscope_long.pdf", width = 12,  height = 9)
+grid.arrange(arrangeGrob(long_plot, left = y.grob)) #adding common y axis label to plot
+dev.off()
+
+```
+
+## Relative Edge Sharpness 
+```{r relative edge sharpness plots}
+
+# Creating new column with the eye and probe identity
+edge_data <- edge_data %>%
+  mutate(eye_probe = paste(eye, probe, sep="_"))
+
+# individual eye line plots
+
+#LE1
+LE1_edge_plot <- edge_data %>%
+  filter(eye == "LE1") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
+  #geom_point() +
+  stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) +
+  scale_colour_manual(values = c("#009E73", "#CC79A7", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) +
+  scale_fill_manual(values = c("#009E73", "#CC79A7", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_x_continuous("Distance from Back Surface of Lens", 
+                     breaks = c(250, 350, 450, 550), 
+                     limits = c(185, 600)) +
+  scale_y_continuous("Relative Edge Sharpness",
+                     breaks = c(1, 1.5, 2.5, 3.5)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 15))
+
+LE1_edge_plot 
+
+#LE2
+LE2_edge_plot <- edge_data %>%
+  filter(eye == "LE2") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
+  #geom_point() +
+  stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe))+
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_x_continuous("Distance from Back Surface of Lens", 
+                     breaks = c(250, 350, 450, 550), 
+                     limits = c(185, 600)) +
+  scale_y_continuous("Relative Edge Sharpness",
+                     breaks = c(1, 2, 3, 4)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 15))
+
+LE2_edge_plot 
+
+#RE1
+RE1_edge_plot <- edge_data %>%
+  filter(eye == "RE1") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
+  #geom_point() +
+   stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) + 
+  scale_colour_manual(values = c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_fill_manual(values = c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_x_continuous("Distance from Back Surface of Lens", 
+                     breaks = c(250, 350, 450, 550), 
+                     limits = c(185, 600)) +
+  scale_y_continuous("Relative Edge Sharpness",
+                     breaks = c(1, 2, 3, 4)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+        legend.position = "none")
+
+RE1_edge_plot 
+
+#RE2
+RE2_edge_plot <- edge_data %>%
+  filter(eye == "RE2") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye_probe, colour = eye_probe)) +
+  #geom_point() +
+  stat_smooth(span = 0.005, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) + 
+  scale_colour_manual(values = c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_fill_manual(values = c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_x_continuous("Distance from Back Surface of Lens", 
+                     breaks = c(250, 350, 450, 550), 
+                     limits = c(185, 600)) +
+  scale_y_continuous("Relative Edge Sharpness",
+                     breaks = c(1, 2, 3, 4)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+        legend.position = "none")
+
+RE2_edge_plot 
+
+# Unused but useful bit of code
+# Melting the data by distance to make it long format edge_data <- melt(edge_data, id.vars = "distance", value.name = "contrast")
+
+# Pulling information from rows and trying to organise it into a new column: edge_data_long$left <- str_detect(edge_data_long$variable, "L") 
+
+```
+
+```{r edge sharpness figure}
+
+pdf(file = "Figures/LE2_edge_sharpness.pdf", width = 8,  height = 6)
+LE2_edge_plot
+dev.off()
+
+```
+
+```{r back focal length boxplots}
+
+#LE1
+LE1_focal <- focal_data %>%
+  filter(eye == "LE1") %>%
+  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x="Left Eye 1", y = "Back focal length") +
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+LE1_focal
+
+#LE2
+LE2_focal <- focal_data %>%
+  filter(eye == "LE2") %>%
+  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x="Left Eye 2", y = "Back focal length") +
+  geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+LE2_focal
+
+RE1_focal <- focal_data %>%
+  filter(eye == "RE1") %>%
+  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x="Right Eye 1", y = "Back focal length") +
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+RE1_focal
+
+
+#RE2
+RE2_focal <- focal_data %>%
+  filter(eye == "RE2") %>%
+  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x="Right Eye 2", y = "Back focal length") +
+  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+RE2_focal
+
+# scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+# scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+```
+
+```{r back focal length figure}
+
+pdf(file = "Figures/LE2_back_focal.pdf", width = 8.5,  height = 8.5)
+LE2_focal
+dev.off()
+
+```
+
+## Behaviour
+```{r calculating total strikes and hunting success}
+
+# Creating total strike and percentage hunting success columns
+behaviour_data <- behaviour_data %>%
+  mutate(total_strikes = missed_strikes + succesful_strikes) %>%
+  mutate(missed_dead_prey_strikes_NA_removed = missed_dead_prey_strikes) %>% # duplicating the missed dead prey strikes column because NAs need to be turned to 0s to properly calculate % hunting success. 
+  replace_na(list(missed_dead_prey_strikes_NA_removed = 0)) %>%
+  mutate(hunting_success = (succesful_strikes - (dead_prey_strikes - missed_dead_prey_strikes_NA_removed))/3 * 100)
+```
+
+### Normal light conditions
+```{r normal light horizontal behaviour boxplots}
+
+## Horizontal arena
+
+# missed strikes
+missed_strikes_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "normal") %>%
+  ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Missed Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+missed_strikes_horizontal
+
+# successful strikes
+succesful_strikes_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "normal") %>%
+  ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Succesful Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+succesful_strikes_horizontal
+
+# latency
+latency_horizontal <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "horizontal" & light_environment == "normal") %>%
+  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+                                 legend.position = "none")
+
+latency_horizontal
+
+# hunting success
+hunting_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "normal") %>%
+  ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "% Hunting success") +
+  geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center', # using geom_dotplot here instead of geom_jitter so that the points are stacked horizontally and centre aligned (stackdir). Important as there are only 3 values for hunting success and geom_jitter makes it seem like there are more.
+        stackratio = 1.5, dotsize = 0.7, position = position_dodge(0.8)) + #stackratio adjusts distance between points 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+        legend.position = "none")
+
+hunting_horizontal
+
+# total strikes
+total_strikes_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "normal") %>%
+  ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Total Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+total_strikes_horizontal
+
+```
+
+```{r normal light vertical behaviour boxplots}
+
+## Vertical arena
+
+# missed strikes
+missed_strikes_vertical
+missed_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Missed Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+missed_strikes_vertical
+
+# successful strikes
+succesful_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Succesful Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+succesful_strikes_vertical
+
+# latency
+latency_vertical <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 25, face = "bold"),
+                                 legend.position = "none")
+
+latency_vertical
+
+# hunting success
+hunting_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "% Hunting success") +
+  geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
+        stackratio = 1.5, dotsize = 0.7, position = position_dodge(0.8)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+        legend.position = "none")
+
+hunting_vertical
+
+# total strikes
+total_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Total Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+total_strikes_vertical
+
+```
+
+### Dark light conditions - 96% LEDs covered and UV supplementation removed
+```{r dark horizontal behaviour boxplots}
+
+## Horizontal arena
+
+# missed strikes
+dark_missed_strikes_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Missed Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+dark_missed_strikes_horizontal
+
+# successful strikes
+dark_succesful_strikes_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Succesful Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+dark_succesful_strikes_horizontal
+
+# latency
+dark_latency_horizontal <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+                                 legend.position = "none")
+
+dark_latency_horizontal
+
+# hunting success
+dark_hunting_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "% Hunting success") +
+  geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
+        stackratio = 1.5, dotsize = 0.7, position = position_dodge(0.8)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+        legend.position = "none")
+
+dark_hunting_horizontal
+
+# total strikes
+dark_total_strikes_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Total Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+dark_total_strikes_horizontal
+
+```
+
+```{r dark vertical behaviour boxplots}
+
+## Vertical arena
+
+# missed strikes
+dark_missed_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Missed Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+dark_missed_strikes_vertical
+
+# successful strikes
+dark_succesful_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Succesful Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+dark_succesful_strikes_vertical
+
+# latency
+dark_latency_vertical <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 25, face = "bold"),
+                                 legend.position = "none")
+
+dark_latency_vertical
+
+# hunting success
+dark_hunting_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "% Hunting success") +
+  geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
+        stackratio = 1.5, dotsize = 0.7, position = position_dodge(0.8)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+        legend.position = "none")
+
+dark_hunting_vertical
+
+# total strikes
+dark_total_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Total Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+
+dark_total_strikes_vertical
+
+```
+
+# Statistics
+```{r ophthalmoscope stats}
+
+# Test for normality
+shapiro.test(oph_data$bestimagereciprocal)
+
+```
+
+Can't really use the following code because treating the left and right eyes as individual data points would be pseudo-replication...
+
+oph_test <- oph_data %>%
+  filter(probe != "lens3_191") %>%
+  filter(eye == "LE1" | eye == "RE1") 
+
+t.test(oph_test$bestimagereciprocal ~ oph_test$probe)  
+

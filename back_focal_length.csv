@@ -1,0 +1,113 @@
+individual,probe,eye,peak_1_um,peak_2_um,average,notes
+C13,control,RE1,440,455,,Not super sure of second peak
+C13,control,RE2,360,415,,Unsure of second peak
+C14,control,LE1,375,480,,Unsure of first peak
+C14,control,LE2,360,435,,
+C14,control,RE1,NA,435,,Barely a trace of a first peak around 360
+C14,control,RE2,330,385,,Very small first peak
+C15,control,LE1,325,375,,
+C15,control,LE2,335,360,,
+C15,control,RE1,405,460,,
+C15,control,RE2,NA,400,,No trace of first peak
+C16,control,LE1,NA,450,,No trace of first peak
+C16,control,LE2,355,415,,Very small first peak
+C16,control,RE1,395,450,,Very unsure of first peak
+C16,control,RE2,NA,385,,No trace of first peak
+C17,control,LE1,NA,440,,No trace of first peak
+C17,control,LE2,NA,385,,No trace of first peak
+C17,control,RE1,NA,430,,No trace of first peak
+C17,control,RE2,335,400,,There's a weird third peak after this
+C18,control,LE1,NA,500,,No trace of first peak
+C18,control,LE2,360,410,,Very small first peak
+C18,control,RE1,425,480,,
+C18,control,RE2,370,440,,
+C19,control,LE1,NA,385,,No trace of first peak
+C19,control,LE2,315,365,,
+C19,control,RE1,365,425,,
+C19,control,RE2,300,325,,
+C20,control,LE1,NA,345,,No trace of first peak
+C20,control,LE2,NA,300,,No trace of first peak
+C20,control,RE1,NA,335,,No trace of first peak
+C20,control,RE2,NA,300,,No trace of first peak
+191_14,lens3_191,LE1,365,400,,
+191_14,lens3_191,LE2,300,390,,
+191_14,lens3_191,RE1,335,400,,
+191_14,lens3_191,RE2,NA,350,,No trace of first peak
+191_15,lens3_191,LE1,NA,280,,Can't make out peaks very well
+191_15,lens3_191,LE2,NA,NA,,Can't make out peaks at all
+191_15,lens3_191,RE1,NA,350,,"No trace of first peak, second very small"
+191_15,lens3_191,RE2,NA,315,,No trace of first peak
+191_16,lens3_191,LE1,390,475,,
+191_16,lens3_191,LE2,NA,505,,No trace of first peak
+191_16,lens3_191,RE1,NA,455,,Can't make out first peak
+191_16,lens3_191,RE2,360,415,,
+191_17,lens3_191,LE1,420,465,,Peaks barely visible
+191_17,lens3_191,LE2,335,410,,
+191_17,lens3_191,RE1,410,440,,Very small first peak
+191_17,lens3_191,RE2,365,435,,
+191_18,lens3_191,LE1,340,415,,
+191_18,lens3_191,LE2,330,390,,
+191_18,lens3_191,RE1,NA,410,,No trace of first peak
+191_18,lens3_191,RE2,325,385,,Very small first peak
+191_19,lens3_191,LE1,NA,415,,No trace of first peak
+191_19,lens3_191,LE2,300,340,,
+191_19,lens3_191,RE1,NA,375,,No trace of first peak
+191_19,lens3_191,RE2,NA,370,,Can't make out first peak
+191_20,lens3_191,LE1,NA,395,,No trace of first peak
+191_20,lens3_191,LE2,290,365,,Very unsure of first peak
+191_20,lens3_191,RE1,325,435,,Unsure of second peak
+191_20,lens3_191,RE2,NA,375,,No trace of first peak
+191_21,lens3_191,LE1,420,470,,Not too sure of peaks
+191_21,lens3_191,LE2,310,395,,
+191_21,lens3_191,RE1,NA,410,,Can't make out first peak
+191_21,lens3_191,RE2,340,405,,
+191_22,lens3_191,LE1,380,425,,
+191_22,lens3_191,LE2,NA,340,,Can't make out first peak
+191_22,lens3_191,RE1,370,420,,
+191_22,lens3_191,RE2,330,385,,
+191_23,lens3_191,LE1,355,465,,
+191_23,lens3_191,LE2,290,365,,
+191_23,lens3_191,RE1,370,435,,
+191_23,lens3_191,RE2,NA,395,,Can't make out first peak
+249_8,lens3_249,LE1,440,510,,
+249_8,lens3_249,LE2,335,410,,
+249_8,lens3_249,RE1,430,475,,Slightly unsure of first peak
+249_8,lens3_249,RE2,340,400,,
+249_9,lens3_249,LE1,400,455,,
+249_9,lens3_249,LE2,395,445,,Three peaks. Very weird. Verified against image series
+249_9,lens3_249,RE1,340,455,,
+249_9,lens3_249,RE2,325,380,,
+249_10,lens3_249,LE1,395,455,,Difficult to make out peaks
+249_10,lens3_249,LE2,325,385,,
+249_10,lens3_249,RE1,390,450,,
+249_10,lens3_249,RE2,290,380,,
+249_11,lens3_249,LE1,385,455,,Three peaks. Very weird. Verified against image series
+249_11,lens3_249,LE2,NA,405,,Can't make out first peak
+249_11,lens3_249,RE1,NA,475,,Can't make out first peak
+249_11,lens3_249,RE2,NA,370,,Can't make out first peak
+249_12,lens3_249,LE1,315,385,,
+249_12,lens3_249,LE2,305,380,,
+249_12,lens3_249,RE1,385,455,,
+249_12,lens3_249,RE2,340,405,,
+249_13,lens3_249,LE1,405,445,,Peaks hard to make out
+249_13,lens3_249,LE2,NA,NA,,Can't make out peaks at all
+249_13,lens3_249,RE1,345,415,,
+249_13,lens3_249,RE2,335,385,,
+249_14,lens3_249,RE1,NA,415,,Can't make out first peak
+249_14,lens3_249,RE2,NA,390,,Can't make out first peak
+249_15,lens3_249,LE1,340,410,,
+249_15,lens3_249,LE2,310,400,,
+249_15,lens3_249,RE1,325,395,,
+249_15,lens3_249,RE2,NA,310,,No trace of first peak
+249_16,lens3_249,LE1,NA,375,,No trace of first peak
+249_16,lens3_249,LE2,220,295,,
+249_16,lens3_249,RE1,NA,500,,No trace of first peak
+249_16,lens3_249,RE2,NA,420,,No trace of first peak
+249_17,lens3_249,LE1,NA,NA,,Can't make out peaks at all
+249_17,lens3_249,LE2,400,480,,Very unsure of first peak
+249_17,lens3_249,RE1,NA,NA,,Can't make out peaks at all
+249_17,lens3_249,RE2,335,425,,Difficult to make out peaks
+249_18,lens3_249,LE1,370,425,,
+249_18,lens3_249,LE2,315,370,,
+249_18,lens3_249,RE1,NA,465,,No trace of first peak
+249_18,lens3_249,RE2,320,415,,Three peaks. Very weird. Verified against image series
