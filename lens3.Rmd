@@ -1,5 +1,5 @@
 ---
-title: "Deconstructing a Complex Lens - Functional implications of key lens protein knockdown in *Thermonectus marmoratus*"
+title: "Deconstructing a complex Lens - functional implications of key lens protein knockdown in *Thermonectus marmoratus*"
 authors: "Mitra AT., Rathore S., Jester A., Hyland-Brown R., Benoit JB., Stowasser A, Tomoyasu Y., Buschbeck EK."
 date: "7 April 2024"
 output:
@@ -57,109 +57,96 @@ behaviour_data <- read.csv("lens3_behaviour.csv", header = TRUE)
 # na.strings converts "NA", "" and " " into na within the body of the file
 ```
 
-#---- Unused plots & analyses
+```{r unused plots & analyses, include=FALSE}
 
+#Calculating focal length
 
-Calculating focal length
+#Focal length can be estimated in two ways. The first is a calculation of effective focal length (F)-1) F = (image size / object size) * object distance. The effective focal length is an opitcal measurement given as the distance from a principal plane of an optical lens to its imaging plane - Edmund Optics
 
-Focal length can be estimated in two ways. The first is a calculation of effective focal length (F)- 
-1) F = (image size / object size) * object distance
-The effective focal length is an opitcal measurement given as the distance from a principal plane of an optical lens to its imaging plane - Edmund Optics
+#The second is a calculation of back focal length (BFL)-2) BFL = (best object image# - best back surface of lens image#) * 5 * 1.33Multiplying by 5 because the images are taken at 5 um increments. 1.33 is the refractive index of water because these lenses view in water and are thus suspended in water for the hanging drop. The back focal length is a mechanical measurement given as the distance between the last surface of an optical lens to its image plane.
 
-The second is a calculation of back focal length (BFL) -
-2) BFL = (best object image# - best back surface of lens image#) * 5 * 1.33
-Multiplying by 5 because the images are taken at 5 um increments. 1.33 is the refractive index of water because these lenses view in water and are thus suspended in water for the hanging drop.
-The back focal length is a mechanical measurement given as the distance between the last surface of an optical lens to its image plane.
+#Instead of picking the best focused image manually, back focal length can be estimated from the MATLAB code written by Annette in her current biology bifocal lens paper. This is arguably a more accurate and less biased way of estimating focal length.  
 
-Instead of picking the best focused image manually, back focal length can be estimated from the MATLAB code written by Annette in her current biology bifocal lens paper. This is arguably a more accurate and less biased way of estimating focal length.  
+#This is especially because lens3 RNAi causes cataracts which form blurry images which makes it really hard to pick out the best focused image manually. The code also captures that blurriness in the form of low image contrast curves. 
+#Calculating difference in size between the first and second images for each eye for each larva. 
 
-This is especially because lens3 RNAi causes cataracts which form blurry images which makes it really hard to pick out the best focused image manually. The code also captures that blurriness in the form of low image contrast curves. 
-Calculating difference in size between the first and second images for each eye for each larva. 
+#From micrometer slide measured on the 20x objective, 100 um = 151.037 pixels so
+#pixel_size <- (100/151.037) = 0.6620894
 
-From micrometer slide measured on the 20x objective, 100 um = 151.037 pixels so
-pixel_size <- (100/151.037) = 0.6620894
-
-Calculating image size in  um
-  hang_data <- hang_data %>% 
-  mutate(image_1_size = (image_1_size_pixels * pixel_size),
-         image_2_size = (image_2_size_pixels * pixel_size)) 
+#Calculating image size in  um
+  #hang_data <- hang_data %>% 
+  #mutate(image_1_size = (image_1_size_pixels * pixel_size),
+         #image_2_size = (image_2_size_pixels * pixel_size)) 
  
-Size of grating in um
-  object_size <- 10000
+#Size of grating in um
+  #object_size <- 10000
  
-Distance between grating and lens in um
-  object_distance <- 125000
+#Distance between grating and lens in um
+  #object_distance <- 125000
   
-Focal length in um
-hang_data <- hang_data %>%
-  mutate(focal_length_1 = ((image_1_size/object_size)*object_distance),
-         focal_length_2 = ((image_1_size/object_size)*object_distance))
+#Focal length in um
+#hang_data <- hang_data %>%
+  #mutate(focal_length_1 = ((image_1_size/object_size)*object_distance),
+         #focal_length_2 = ((image_1_size/object_size)*object_distance))
 
-Calculating difference in image size
-hang_data <- hang_data %>%
-  mutate(image_size_diff = (image_2_size - image_1_size))
+#Calculating difference in image size
+#hang_data <- hang_data %>%
+  #mutate(image_size_diff = (image_2_size - image_1_size))
 
 
-Visualising differences in focal length between groups. These are per image and per eye.
+#Visualising differences in focal length between groups. These are per image and per eye.
 
-Left Eye 1
-
-LE1 Image 1
-LE1_image1_plot <- hang_data %>%
-  filter(eye == "LE1") %>%
-  ggplot(aes(y= focal_length_1, x = group, fill = group)) +
-  geom_violin(trim = FALSE, alpha = 0.7) +
-  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  labs(title=NULL,x="Left Eye 1: Image 1", y = "Focal length (um)") +
-  scale_x_discrete(labels = c('Control', "lens3 Injected")) +
-  geom_boxplot(width=0.15, fill="white", outlier.alpha = 0)+
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(text = element_text(size = rel(4)), legend.position = "none")
+#LE1 Image 1
+#LE1_image1_plot <- hang_data %>%
+  #filter(eye == "LE1") %>%
+  #ggplot(aes(y= focal_length_1, x = group, fill = group)) +
+  #geom_violin(trim = FALSE, alpha = 0.7) +
+  #scale_fill_manual(values=c("#009E73", "#E69F00")) +
+  #labs(title=NULL,x="Left Eye 1: Image 1", y = "Focal length (um)") +
+  #scale_x_discrete(labels = c('Control', "lens3 Injected")) +
+  #geom_boxplot(width=0.15, fill="white", outlier.alpha = 0)+
+  #geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  #theme_classic() +
+  #theme(text = element_text(size = rel(4)), legend.position = "none")
   
-LE1_image1_plot
+#LE1_image1_plot
 
-LE1_image_size_plot <- hang_data %>%
-  filter(eye == "LE1") %>%
-  ggplot(aes(y= image_size_diff, x = group, fill = group)) +
-  geom_violin(trim = FALSE, alpha = 0.7) +
-  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  labs(title=NULL,x="Left Eye 1", y = "Difference in image size") +
-  scale_x_discrete(labels = c('Control', "lens3 Injected")) +
-  geom_boxplot(width=0.15, fill="white", outlier.alpha = 0)+
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(text = element_text(size = rel(4)), legend.position = "none")
+#LE1_image_size_plot <- hang_data %>%
+  #filter(eye == "LE1") %>%
+  #ggplot(aes(y= image_size_diff, x = group, fill = group)) +
+  #geom_violin(trim = FALSE, alpha = 0.7) +
+  #scale_fill_manual(values=c("#009E73", "#E69F00")) +
+  #labs(title=NULL,x="Left Eye 1", y = "Difference in image size") +
+  #scale_x_discrete(labels = c('Control', "lens3 Injected")) +
+  #geom_boxplot(width=0.15, fill="white", outlier.alpha = 0)+
+  #geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  #theme_classic() +
+  #theme(text = element_text(size = rel(4)), legend.position = "none")
   
-LE1_image_size_plot
+#LE1_image_size_plot
 
-```{r right and left combined boxplots}
-
-## DO NOT USE - see below
+## Right & left combined boxplots - DO NOT USE - see below
 
 #E1: both probes vs controls
-E1_oph <- oph_data %>%
-  filter(eye == "LE1" | eye == "RE1") %>%
-  ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8) +
-  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
-  labs(title=NULL,x="Eye 1", y = "Object distance (mm)") +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
+#E1_oph <- oph_data %>%
+  #filter(eye == "LE1" | eye == "RE1") %>%
+  #ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
+  #geom_boxplot(alpha = 0.8) +
+  #scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  #labs(title=NULL,x="Eye 1", y = "Object distance (mm)") +
+  #scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  #scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+  #geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  #theme_classic() +
+  #theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        #axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        #axis.text = element_text(size = 20, face = "bold"),
+                                 #legend.position = "none")
 
-E1_oph
+#E1_oph
+
+# Not using these as the analyses don't combine left and right eyes (that becomes pseudo-replication!)
 ```
-
-^Not using these as the analyses don't combine left and right eyes (that becomes pseudo-replication!)
-
-
-
 
 # Figures
 
@@ -172,7 +159,7 @@ LE1_oph <- oph_data %>%
   filter(eye == "LE1") %>%
   ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8) +
-  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Left Eye 1", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
@@ -190,7 +177,7 @@ LE2_oph <- oph_data %>%
   filter(eye == "LE2") %>%
   ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8) +
-  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Left Eye 2", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
@@ -208,7 +195,7 @@ RE1_oph <- oph_data %>%
   filter(eye == "RE1") %>%
   ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8) +
-  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Right Eye 1", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
@@ -227,7 +214,7 @@ RE2_oph <- oph_data %>%
   filter(eye == "RE2") %>%
   ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = 17, outlier.size = 2, position = "dodge2") + # Changing outlier shape
-  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Right Eye 2", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
@@ -395,8 +382,8 @@ LE1_edge_plot <- edge_data %>%
   ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
   #geom_point() +
   stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) +
-  scale_colour_manual(values = c("#009E73", "#CC79A7", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) +
-  scale_fill_manual(values = c("#009E73", "#CC79A7", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
   scale_x_continuous("Distance from Back Surface of Lens", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
@@ -439,8 +426,8 @@ RE1_edge_plot <- edge_data %>%
   ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
   #geom_point() +
    stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) + 
-  scale_colour_manual(values = c("#009E73", "#CC79A7", "#D55E00")) +
-  scale_fill_manual(values = c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_continuous("Distance from Back Surface of Lens", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
@@ -460,8 +447,8 @@ RE2_edge_plot <- edge_data %>%
   ggplot(aes(y= contrast, x = distance, group = eye_probe, colour = eye_probe)) +
   #geom_point() +
   stat_smooth(span = 0.005, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) + 
-  scale_colour_manual(values = c("#009E73", "#CC79A7", "#D55E00")) +
-  scale_fill_manual(values = c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_continuous("Distance from Back Surface of Lens", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
@@ -490,6 +477,8 @@ dev.off()
 
 ```
 
+## Back focal length
+Only using the 2nd (taller) peak for this because the 1st is often hard to detect, especially in knockdowns. Went through the image series side-by-side to verify these. 
 ```{r back focal length boxplots}
 
 #LE1
@@ -497,7 +486,7 @@ LE1_focal <- focal_data %>%
   filter(eye == "LE1") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   labs(title=NULL,x="Left Eye 1", y = "Back focal length") +
   geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -530,7 +519,7 @@ RE1_focal <- focal_data %>%
   filter(eye == "RE1") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   labs(title=NULL,x="Right Eye 1", y = "Back focal length") +
   geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -548,7 +537,7 @@ RE2_focal <- focal_data %>%
   filter(eye == "RE2") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#CC79A7", "#D55E00")) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   labs(title=NULL,x="Right Eye 2", y = "Back focal length") +
   geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -770,7 +759,8 @@ total_strikes_vertical
 
 ```
 
-### Dark light conditions - 96% LEDs covered and UV supplementation removed
+### Dark conditions
+96% LEDs covered and UV supplementation removed
 ```{r dark horizontal behaviour boxplots}
 
 ## Horizontal arena
@@ -958,6 +948,8 @@ dark_total_strikes_vertical
 ```
 
 # Statistics
+
+## Ophthalmoscope
 ```{r ophthalmoscope stats}
 
 ## Test for normality
@@ -990,17 +982,16 @@ res_oph_kw
 
 ```
 
+## Edge sharpness series
 ```{r edge sharpness stats}
 
 # Building linear models for each curve 
-
-#  
-cmod<-lm(contrast ~ distance*factor(eye_probe), data=edge_data)
 
 # LE2
 edge_model_control_LE2 <- lm(contrast ~ distance,
                              data = edge_data,
                              subset = eye_probe == "LE2_control")
+
 edge_model_249_LE2 <- lm(contrast ~ distance,
                              data = edge_data,
                              subset = eye_probe == "LE2_lens3_249")
@@ -1009,6 +1000,39 @@ edge_model_191_LE2 <- lm(contrast ~ distance,
                              data = edge_data,
                              subset = eye_probe == "LE2_lens3_191")
 
+# kruskal.test(edge_model_249_LE2, edge_model_control_LE2, edge_model_191_LE2)
 
 ```
 
+## Back focal length
+```{r back focal length stats}
+
+## Test for normality
+
+# Building the linear model
+focal_model <- lm(peak_2_um ~ probe, data = focal_data)
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(focal_model))
+
+# Test for normality
+shapiro_test(residuals(focal_model))
+# p > 0.05 so assuming normality
+
+# Checking normality assumption by groups
+focal_data %>%
+  group_by(probe) %>%
+  shapiro_test(peak_2_um)
+# again p > 0.05 so assuming normality
+
+# Creating QQ plots for each group level
+ggqqplot(focal_data, "peak_2_um", facet.by = "probe")
+# Control and Probe 1 look normal. Probe 2 is kinda wonky. But will proceed with Gaussian stats
+
+# Using an ANOVA test
+res_focal_aov <- compare_means(peak_2_um ~ probe, data = focal_data, 
+              group.by = "eye", method = 'anova')
+res_focal_aov
+# No significant changes in back focal length with lens3 knockdown - all eyes
+
+```
