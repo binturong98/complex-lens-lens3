@@ -1001,7 +1001,6 @@ cmod<-lm(contrast ~ distance*factor(eye_probe), data=edge_data)
 edge_model_control_LE2 <- lm(contrast ~ distance,
                              data = edge_data,
                              subset = eye_probe == "LE2_control")
-
 edge_model_249_LE2 <- lm(contrast ~ distance,
                              data = edge_data,
                              subset = eye_probe == "LE2_lens3_249")
@@ -1010,7 +1009,6 @@ edge_model_191_LE2 <- lm(contrast ~ distance,
                              data = edge_data,
                              subset = eye_probe == "LE2_lens3_191")
 
-anova(edge_model_control_LE2, edge_model_191_LE2, edge_model_191_LE2)
 
 ```
 
