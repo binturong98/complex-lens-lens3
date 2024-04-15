@@ -978,6 +978,8 @@ ggqqplot(oph_data, "bestimagereciprocal", facet.by = "probe")
 res_oph_kw <- compare_means(bestimagereciprocal ~ probe, data = oph_data, 
               group.by = "eye", method = 'kruskal.test')
 res_oph_kw
+
+summary(res_oph_kw)
 # No significant changes in focused state with lens3 knockdown - all eyes
 
 ```
@@ -985,20 +987,12 @@ res_oph_kw
 ## Edge sharpness series
 ```{r edge sharpness stats}
 
-# Building linear models for each curve 
+# Building linear models for each eye
 
 # LE2
 edge_model_control_LE2 <- lm(contrast ~ distance,
                              data = edge_data,
                              subset = eye_probe == "LE2_control")
-
-edge_model_249_LE2 <- lm(contrast ~ distance,
-                             data = edge_data,
-                             subset = eye_probe == "LE2_lens3_249")
-
-edge_model_191_LE2 <- lm(contrast ~ distance,
-                             data = edge_data,
-                             subset = eye_probe == "LE2_lens3_191")
 
 # kruskal.test(edge_model_249_LE2, edge_model_control_LE2, edge_model_191_LE2)
 
@@ -1033,6 +1027,98 @@ ggqqplot(focal_data, "peak_2_um", facet.by = "probe")
 res_focal_aov <- compare_means(peak_2_um ~ probe, data = focal_data, 
               group.by = "eye", method = 'anova')
 res_focal_aov
+
+summary(res_focal_aov)
 # No significant changes in back focal length with lens3 knockdown - all eyes
+
+```
+
+## Behaviour
+
+### Normal light conditions
+```{r normal light behaviour stats}
+
+# Latency
+## Test for normality 
+
+# Building the linear model
+latency_model_hor_light <- lm(latency_min ~ probe, data = behaviour_data, subset = (light_environment == 'normal' & arena == 'horizontal'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(latency_model_hor_light))
+
+# Test for normality
+shapiro_test(residuals(latency_model_hor_light))
+# p < 0.05 so can't assume normality
+
+# Checking normality assumption by groups
+behaviour_data %>%
+  filter(light_environment == 'normal' & arena == 'horizontal') %>%
+  group_by(probe) %>%
+  shapiro_test(latency_min)
+# controls aren't normal but the other two are?
+
+# Creating QQ plots for each group level
+#ggqqplot(focal_data, "peak_2_um", facet.by = "probe")
+# Control and Probe 1 look normal. Probe 2 is kinda wonky. But will proceed with Gaussian stats
+
+# Using an ANOVA test
+res_latency_light_hor_kw <- compare_means(latency_min ~ probe, data = behaviour_data, 
+                                          subset = (light_environment == 'normal'), 
+                                          group.by = "arena", method = 'kruskal.test')
+res_latency_light_hor_kw
+
+# No significant changes in back focal length with lens3 knockdown - all eyes
+
+```
+
+### Dark conditions
+```{r dark behaviour stats}
+
+# Latency
+## Test for normality 
+
+# Building the linear model
+latency_model_hor_dark <- lm(latency_min ~ probe, data = behaviour_data, subset = (light_environment == 'dark' & arena == 'horizontal'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(latency_model_hor_dark))
+
+# Test for normality
+shapiro_test(residuals(latency_model_hor_dark))
+# p > 0.05 so can assume normality
+
+# Checking normality assumption by groups
+behaviour_data %>%
+  filter(light_environment == 'dark' & arena == 'horizontal') %>%
+  group_by(probe) %>%
+  shapiro_test(latency_min)
+# controls aren't normal but the other two are?
+
+# Creating QQ plots for each group level
+#ggqqplot(focal_data, "peak_2_um", facet.by = "probe")
+# Control and Probe 1 look normal. Probe 2 is kinda wonky. But will proceed with Gaussian stats
+
+# Using an ANOVA test
+res_latency_dark <- compare_means(latency_min ~ probe, data = behaviour_data, 
+                                          subset = (light_environment == 'dark'), 
+                                          group.by = "arena", method = 'anova')
+res_latency_dark
+
+results_dark_horizontal <- behaviour_data %>%
+  filter(light_environment == 'dark', arena == 'horizontal') %>%
+  welch_anova_test(latency_min ~ probe)
+
+results_dark_horizontal
+
+results_dark_vertical <- behaviour_data %>%
+  filter(light_environment == 'dark', arena == 'vertical') %>%
+  welch_anova_test(latency_min ~ probe)
+
+results_dark_vertical
+
+
+```
+
 
 ```
