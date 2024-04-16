@@ -55,6 +55,9 @@ focal_data <- read.csv("back_focal_length.csv", header = TRUE)
 behaviour_data <- read.csv("lens3_behaviour.csv", header = TRUE)
 
 # na.strings converts "NA", "" and " " into na within the body of the file
+
+# colourblind friendly palette
+palette.colors(palette = "Okabe-Ito")
 ```
 
 ```{r unused plots & analyses, include=FALSE}
@@ -169,7 +172,6 @@ LE1_oph <- oph_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 LE1_oph
 
 #LE2
@@ -187,7 +189,6 @@ LE2_oph <- oph_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 LE2_oph
 
 #RE1
@@ -205,7 +206,6 @@ RE1_oph <- oph_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 RE1_oph
 
 #RE2
@@ -224,7 +224,6 @@ RE2_oph <- oph_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 RE2_oph
 
 # Making the individual boxes narrow and putting them next to each other like the osmosis paper figures
@@ -253,7 +252,6 @@ E1_LR_oph <- oph_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 E1_LR_oph 
 
 # Trying custom facet grid labels and using the labeller function
@@ -287,7 +285,6 @@ E2_LR_oph <- oph_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 E2_LR_oph 
 
 # Trying custom facet grid labels and using the labeller function
@@ -395,7 +392,6 @@ LE1_edge_plot <- edge_data %>%
         axis.text = element_text(size = 20, face = "bold"),
         legend.title = element_blank(),
         legend.text = element_text(size = 15))
-
 LE1_edge_plot 
 
 #LE2
@@ -417,7 +413,6 @@ LE2_edge_plot <- edge_data %>%
         axis.text = element_text(size = 20, face = "bold"),
         legend.title = element_blank(),
         legend.text = element_text(size = 15))
-
 LE2_edge_plot 
 
 #RE1
@@ -438,7 +433,6 @@ RE1_edge_plot <- edge_data %>%
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
         legend.position = "none")
-
 RE1_edge_plot 
 
 #RE2
@@ -459,7 +453,6 @@ RE2_edge_plot <- edge_data %>%
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
         legend.position = "none")
-
 RE2_edge_plot 
 
 # Unused but useful bit of code
@@ -495,7 +488,6 @@ LE1_focal <- focal_data %>%
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 LE1_focal
 
 #LE2
@@ -512,7 +504,6 @@ LE2_focal <- focal_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 LE2_focal
 
 RE1_focal <- focal_data %>%
@@ -528,7 +519,6 @@ RE1_focal <- focal_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 RE1_focal
 
 
@@ -546,7 +536,6 @@ RE2_focal <- focal_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 RE2_focal
 
 # scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
@@ -562,7 +551,7 @@ dev.off()
 ```
 
 ## Behaviour
-```{r calculating total strikes and hunting success}
+```{r calculating total strikes & hunting success}
 
 # Creating total strike and percentage hunting success columns
 behaviour_data <- behaviour_data %>%
@@ -570,14 +559,21 @@ behaviour_data <- behaviour_data %>%
   mutate(missed_dead_prey_strikes_NA_removed = missed_dead_prey_strikes) %>% # duplicating the missed dead prey strikes column because NAs need to be turned to 0s to properly calculate % hunting success. 
   replace_na(list(missed_dead_prey_strikes_NA_removed = 0)) %>%
   mutate(hunting_success = (succesful_strikes - (dead_prey_strikes - missed_dead_prey_strikes_NA_removed))/3 * 100)
+
+# Creating a column with Probe 1 and Probe 2 pooled into a single lens3 category
+behaviour_data <- behaviour_data %>%
+  mutate(group = probe) %>% # making a duplicate probe column called group
+  mutate(group = replace(group, probe == 'lens3_191' | probe == 'lens3_249', 'lens3')) # using probe as a reference, replacing 'lens3_191' and 'lens3_249 with 'lens3'
 ```
 
-### Normal light conditions
-```{r normal light horizontal behaviour boxplots}
 
-## Horizontal arena
+## Normal light conditions
 
-# missed strikes
+### Missed strikes 
+Normal light
+```{r normal light missed strikes}
+
+## horizontal arena
 missed_strikes_horizontal <- behaviour_data %>%
   filter(arena == "horizontal" & light_environment == "normal") %>%
   ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
@@ -591,10 +587,30 @@ missed_strikes_horizontal <- behaviour_data %>%
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 missed_strikes_horizontal
 
-# successful strikes
+## vertical arena
+missed_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Missed Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+missed_strikes_vertical
+```
+
+### Succesful strikes 
+Normal light
+```{r normal light succesful strikes}
+
+## horizontal arena
 succesful_strikes_horizontal <- behaviour_data %>%
   filter(arena == "horizontal" & light_environment == "normal") %>%
   ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
@@ -608,28 +624,30 @@ succesful_strikes_horizontal <- behaviour_data %>%
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
+missed_strikes_horizontal
 
-succesful_strikes_horizontal
-
-# latency
-latency_horizontal <- behaviour_data %>%
-  drop_na(latency_min) %>%
-  filter(arena == "horizontal" & light_environment == "normal") %>%
-  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+## vertical arena
+succesful_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Latency (min)") +
+  labs(title=NULL,x= "", y = "Succesful Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 30, face = "bold"),
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
+succesful_strikes_vertical
+```
 
-latency_horizontal
+### Hunting success
+Normal light
+```{r normal light hunting success}
 
-# hunting success
+## horizontal arena
 hunting_horizontal <- behaviour_data %>%
   filter(arena == "horizontal" & light_environment == "normal") %>%
   ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
@@ -644,85 +662,9 @@ hunting_horizontal <- behaviour_data %>%
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 30, face = "bold"),
         legend.position = "none")
-
 hunting_horizontal
 
-# total strikes
-total_strikes_horizontal <- behaviour_data %>%
-  filter(arena == "horizontal" & light_environment == "normal") %>%
-  ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Total Strikes") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-
-total_strikes_horizontal
-
-```
-
-```{r normal light vertical behaviour boxplots}
-
-## Vertical arena
-
-# missed strikes
-missed_strikes_vertical <- behaviour_data %>%
-  filter(arena == "vertical" & light_environment == "normal") %>%
-  ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Missed Strikes") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-
-missed_strikes_vertical
-
-# successful strikes
-succesful_strikes_vertical <- behaviour_data %>%
-  filter(arena == "vertical" & light_environment == "normal") %>%
-  ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Succesful Strikes") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-
-succesful_strikes_vertical
-
-# latency
-latency_vertical <- behaviour_data %>%
-  drop_na(latency_min) %>%
-  filter(arena == "vertical" & light_environment == "normal") %>%
-  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Latency (min)") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 25, face = "bold"),
-                                 legend.position = "none")
-
-latency_vertical
-
-# hunting success
+## vertical arena
 hunting_vertical <- behaviour_data %>%
   filter(arena == "vertical" & light_environment == "normal") %>%
   ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
@@ -737,10 +679,30 @@ hunting_vertical <- behaviour_data %>%
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 30, face = "bold"),
         legend.position = "none")
-
 hunting_vertical
+```
 
-# total strikes
+### Total strikes 
+Normal light
+```{r normal light total strikes}
+
+# horizontal arena
+total_strikes_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "normal") %>%
+  ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Total Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+total_strikes_horizontal
+
+## vertical arena
 total_strikes_vertical <- behaviour_data %>%
   filter(arena == "vertical" & light_environment == "normal") %>%
   ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
@@ -754,18 +716,98 @@ total_strikes_vertical <- behaviour_data %>%
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 total_strikes_vertical
-
 ```
 
-### Dark conditions
+### Latency 
+Normal light
+```{r normal light latency}
+
+### separate probes
+
+## horizontal arena
+latency_horizontal <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "horizontal" & light_environment == "normal") %>%
+  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+                                 legend.position = "none")
+latency_horizontal
+
+## vertical arena
+latency_vertical <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 25, face = "bold"),
+                                 legend.position = "none")
+latency_vertical
+
+### pooled probes
+
+## horizontal arena
+latency_horizontal_pooled <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "horizontal" & light_environment == "normal") %>%
+  ggplot(aes(y= latency_min, x = group, fill = group)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+  scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", # adds a significance bar
+              map_signif_level = TRUE, textsize = 5, vjust = -0.1) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+                                 legend.position = "none")
+latency_horizontal_pooled
+
+## vertical arena
+latency_vertical_pooled <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y= latency_min, x = group, fill = group)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+  scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", 
+              map_signif_level = TRUE, textsize = 5, vjust = -0.1) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+                                 legend.position = "none")
+latency_vertical_pooled
+```
+
+## Dark conditions
 96% LEDs covered and UV supplementation removed
-```{r dark horizontal behaviour boxplots}
 
-## Horizontal arena
+### Missed strikes
+Dark
+```{r dark missed strikes}
 
-# missed strikes
+## horizontal arena
 dark_missed_strikes_horizontal <- behaviour_data %>%
   filter(arena == "horizontal" & light_environment == "dark") %>%
   ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
@@ -779,10 +821,30 @@ dark_missed_strikes_horizontal <- behaviour_data %>%
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 dark_missed_strikes_horizontal
 
-# successful strikes
+## vertical arena
+dark_missed_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Missed Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+dark_missed_strikes_vertical
+```
+
+### Succesful strikes
+Dark
+```{r dark succesful strikes}
+
+## horizontal arena
 dark_succesful_strikes_horizontal <- behaviour_data %>%
   filter(arena == "horizontal" & light_environment == "dark") %>%
   ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
@@ -796,28 +858,30 @@ dark_succesful_strikes_horizontal <- behaviour_data %>%
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 dark_succesful_strikes_horizontal
 
-# latency
-dark_latency_horizontal <- behaviour_data %>%
-  drop_na(latency_min) %>%
-  filter(arena == "horizontal" & light_environment == "dark") %>%
-  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+## vertical arena
+dark_succesful_strikes_vertical <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Latency (min)") +
+  labs(title=NULL,x= "", y = "Succesful Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 30, face = "bold"),
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
+dark_succesful_strikes_vertical
+```
 
-dark_latency_horizontal
+### Hunting success
+Dark
+```{r dark hunting success}
 
-# hunting success
+## horizontal arena
 dark_hunting_horizontal <- behaviour_data %>%
   filter(arena == "horizontal" & light_environment == "dark") %>%
   ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
@@ -832,85 +896,9 @@ dark_hunting_horizontal <- behaviour_data %>%
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 30, face = "bold"),
         legend.position = "none")
-
 dark_hunting_horizontal
 
-# total strikes
-dark_total_strikes_horizontal <- behaviour_data %>%
-  filter(arena == "horizontal" & light_environment == "dark") %>%
-  ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Total Strikes") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-
-dark_total_strikes_horizontal
-
-```
-
-```{r dark vertical behaviour boxplots}
-
-## Vertical arena
-
-# missed strikes
-dark_missed_strikes_vertical <- behaviour_data %>%
-  filter(arena == "vertical" & light_environment == "dark") %>%
-  ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Missed Strikes") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-
-dark_missed_strikes_vertical
-
-# successful strikes
-dark_succesful_strikes_vertical <- behaviour_data %>%
-  filter(arena == "vertical" & light_environment == "dark") %>%
-  ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Succesful Strikes") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-
-dark_succesful_strikes_vertical
-
-# latency
-dark_latency_vertical <- behaviour_data %>%
-  drop_na(latency_min) %>%
-  filter(arena == "vertical" & light_environment == "dark") %>%
-  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x= "", y = "Latency (min)") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 25, face = "bold"),
-                                 legend.position = "none")
-
-dark_latency_vertical
-
-# hunting success
+## vertical
 dark_hunting_vertical <- behaviour_data %>%
   filter(arena == "vertical" & light_environment == "dark") %>%
   ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
@@ -925,10 +913,30 @@ dark_hunting_vertical <- behaviour_data %>%
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 30, face = "bold"),
         legend.position = "none")
-
 dark_hunting_vertical
+```
 
-# total strikes
+### Total strikes
+Dark
+```{r dark total strikes}
+
+# horizontal arena
+dark_total_strikes_horizontal <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Total Strikes") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+dark_total_strikes_horizontal
+
+# vertical arena
 dark_total_strikes_vertical <- behaviour_data %>%
   filter(arena == "vertical" & light_environment == "dark") %>%
   ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
@@ -942,8 +950,141 @@ dark_total_strikes_vertical <- behaviour_data %>%
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
-
 dark_total_strikes_vertical
+```
+
+### Latency
+Dark
+```{r dark latency}
+
+### separate probes
+
+## horizontal arena
+dark_latency_horizontal_separate <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+                                 legend.position = "none")
+dark_latency_horizontal_separate
+
+## vertical arena
+dark_latency_vertical_separate <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y= latency_min, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 25, face = "bold"),
+                                 legend.position = "none")
+dark_latency_vertical_separate
+
+### pooled probes
+
+## horizontal arena
+dark_latency_horizontal_pooled <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(y= latency_min, x = group, fill = group)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+  scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_signif(comparisons=list(c("control", "lens3")), annotations="*", # adds a significance star
+              map_signif_level = TRUE, textsize = 10, vjust = 0.5) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+                                 legend.position = "none")
+dark_latency_horizontal_pooled
+
+## vertical arena
+dark_latency_vertical_pooled <- behaviour_data %>%
+  drop_na(latency_min) %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y= latency_min, x = group, fill = group)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+  scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  labs(title=NULL,x= "", y = "Latency (min)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_signif(comparisons=list(c("control", "lens3")), annotations="*", # adds a significance star
+              map_signif_level = TRUE, textsize = 10, vjust = 0.5) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 30, face = "bold"),
+                                 legend.position = "none")
+dark_latency_vertical_pooled
+```
+
+```{r latency figure}
+
+#make panels 
+fig.a <- latency_horizontal_pooled +
+  labs(y = NULL) +
+  theme(legend.position = "none") +
+  coord_cartesian(clip = "off") 
+
+fig.a
+
+fig.b <- latency_vertical_pooled +
+  labs(y = NULL) +
+  theme(legend.position = "none") +
+  coord_cartesian(clip = "off")
+
+fig.b
+
+fig.c <- dark_latency_horizontal_pooled +
+  labs(y = NULL) +
+  theme(legend.position = "none") +
+  coord_cartesian(clip = "off") 
+
+fig.c
+
+fig.d <- dark_latency_vertical_pooled +
+  labs(y = NULL) +
+  theme(legend.position = "none") +
+  coord_cartesian(clip = "off")
+
+fig.d
+
+#use cowplot package to nicely plot the graphs together with a shared common legend.
+latency_plot <- plot_grid(fig.a, fig.c, fig.b, fig.d, 
+                   #list of plots to arrange in grid
+                   rel_widths = c(6, 6, 6, 6),
+                   axis = c("b", "b", "b", "b"),
+                   ncol = 2,
+                   vjust = 1)
+
+plot_grid(latency_plot)
+
+y.grob <- textGrob("Latency (min)",
+                   just = "left", hjust = 0.4, vjust = 0.4,
+                   gp = gpar(fontface = "bold",
+                             fontsize = 30), rot = 90)
+
+
+#print graph
+pdf(file = "Figures/latency.pdf", width = 15,  height = 9)
+grid.arrange(arrangeGrob(latency_plot, left = y.grob)) #adding common y axis label to plot
+dev.off()
 
 ```
 
@@ -1035,10 +1176,10 @@ summary(res_focal_aov)
 
 ## Behaviour
 
-### Normal light conditions
-```{r normal light behaviour stats}
+## Normal light conditions
+### Latency separate probes
+```{r normal light latency separate probes}
 
-# Latency
 ## Test for normality 
 
 # Building the linear model
@@ -1059,8 +1200,6 @@ behaviour_data %>%
 # controls aren't normal but the other two are?
 
 # Creating QQ plots for each group level
-#ggqqplot(focal_data, "peak_2_um", facet.by = "probe")
-# Control and Probe 1 look normal. Probe 2 is kinda wonky. But will proceed with Gaussian stats
 
 # Using an ANOVA test
 res_latency_light_hor_kw <- compare_means(latency_min ~ probe, data = behaviour_data, 
@@ -1069,15 +1208,13 @@ res_latency_light_hor_kw <- compare_means(latency_min ~ probe, data = behaviour_
 res_latency_light_hor_kw
 
 # No significant changes in back focal length with lens3 knockdown - all eyes
-
 ```
 
-### Dark conditions
-```{r dark behaviour stats}
+## Dark conditions
+### Latency separate probes
+```{r dark behaviour latency stats separate probes}
 
-# Latency
-## Test for normality 
-
+## Horizontal
 # Building the linear model
 latency_model_hor_dark <- lm(latency_min ~ probe, data = behaviour_data, subset = (light_environment == 'dark' & arena == 'horizontal'))
 
@@ -1093,11 +1230,34 @@ behaviour_data %>%
   filter(light_environment == 'dark' & arena == 'horizontal') %>%
   group_by(probe) %>%
   shapiro_test(latency_min)
-# controls aren't normal but the other two are?
+# Controls not normal but other probes 1 and 2 are?
 
-# Creating QQ plots for each group level
-#ggqqplot(focal_data, "peak_2_um", facet.by = "probe")
-# Control and Probe 1 look normal. Probe 2 is kinda wonky. But will proceed with Gaussian stats
+## Vertical
+# Building the linear model
+latency_model_ver_dark <- lm(latency_min ~ probe, data = behaviour_data, subset = (light_environment == 'dark' & arena == 'vertical'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(latency_model_ver_dark))
+
+# Test for normality
+shapiro_test(residuals(latency_model_ver_dark))
+# p > 0.05 so can assume normality
+
+# Checking normality assumption by groups
+behaviour_data %>%
+  filter(light_environment == 'dark' & arena == 'vertical') %>%
+  group_by(probe) %>%
+  shapiro_test(latency_min)
+# All normal
+
+# Checking for homogeneity of variance across groups with Levene's test
+var_latency_dark <- behaviour_data %>%
+  filter(light_environment == 'dark') %>%
+  group_by(arena) %>%
+  levene_test(latency_min ~ probe)
+
+var_latency_dark
+# Variances are not significantly different across groups
 
 # Using an ANOVA test
 res_latency_dark <- compare_means(latency_min ~ probe, data = behaviour_data, 
@@ -1105,20 +1265,96 @@ res_latency_dark <- compare_means(latency_min ~ probe, data = behaviour_data,
                                           group.by = "arena", method = 'anova')
 res_latency_dark
 
-results_dark_horizontal <- behaviour_data %>%
+# Using a different ANOVA function
+res_latency_dark_horizontal <- behaviour_data %>%
   filter(light_environment == 'dark', arena == 'horizontal') %>%
-  welch_anova_test(latency_min ~ probe)
+  anova_test(latency_min ~ probe)
 
-results_dark_horizontal
+res_latency_dark_horizontal
 
-results_dark_vertical <- behaviour_data %>%
+res_latency_dark_vertical <- behaviour_data %>%
   filter(light_environment == 'dark', arena == 'vertical') %>%
-  welch_anova_test(latency_min ~ probe)
+  anova_test(latency_min ~ probe)
 
-results_dark_vertical
-
-
+res_latency_dark_vertical
+# not significant
 ```
 
+### Latency pooled probes
+```{r dark behaviour latency stats pooled probes}
 
+## Horizontal
+# Building the linear model
+pooled_latency_model_hor_dark <- lm(latency_min ~ group, 
+                                    data = behaviour_data, 
+                                    subset = (light_environment == 'dark' & arena == 'horizontal'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(pooled_latency_model_hor_dark))
+
+# Test for normality
+shapiro_test(residuals(pooled_latency_model_hor_dark))
+# p < 0.05 so can't assume normality
+
+# Checking normality assumption by groups
+behaviour_data %>%
+  filter(light_environment == 'dark' & arena == 'horizontal') %>%
+  group_by(group) %>%
+  shapiro_test(latency_min)
+# controls normal but lens3 not
+
+## Vertical
+# Building the linear model
+pooled_latency_model_ver_dark <- lm(latency_min ~ group, 
+                                    data = behaviour_data, 
+                                    subset = (light_environment == 'dark' & arena == 'vertical'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(pooled_latency_model_ver_dark))
+
+# Test for normality
+shapiro_test(residuals(pooled_latency_model_ver_dark))
+# p > 0.05 so *can* assume normality
+
+# Checking normality assumption by groups
+behaviour_data %>%
+  filter(light_environment == 'dark' & arena == 'vertical') %>%
+  group_by(group) %>%
+  shapiro_test(latency_min)
+# not normal
+
+## non-parametric
+# horizontal test
+res_latency_dark_horizontal_pooled_wil <- behaviour_data %>%
+  filter(light_environment == 'dark', arena == 'horizontal') %>%
+  wilcox_test(latency_min ~ group)
+
+res_latency_dark_horizontal_pooled_wil
+# significant!!
+
+# vertical test
+res_latency_dark_vertical_pooled_wil <- behaviour_data %>%
+  filter(light_environment == 'dark', arena == 'vertical') %>%
+  wilcox_test(latency_min ~ group)
+
+res_latency_dark_vertical_pooled_wil
+# significant!!
+
+## parametric
+# horizontal test
+res_latency_dark_horizontal_pooled_t <- behaviour_data %>%
+  filter(light_environment == 'dark', arena == 'horizontal') %>%
+  t_test(latency_min ~ group)
+
+res_latency_dark_horizontal_pooled_t
+# significant!!
+
+# vertical test
+res_latency_dark_vertical_pooled_t <- behaviour_data %>%
+  filter(light_environment == 'dark', arena == 'vertical') %>%
+  t_test(latency_min ~ group)
+
+res_latency_dark_vertical_pooled_t
+# significant!!
 ```
+
