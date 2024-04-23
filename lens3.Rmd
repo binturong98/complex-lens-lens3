@@ -165,8 +165,9 @@ LE1_oph <- oph_data %>%
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Left Eye 1", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
+                     label = c("5", "10", "∞", "10","5")) + # reciprocal for image distance
+  geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
@@ -182,8 +183,9 @@ LE2_oph <- oph_data %>%
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Left Eye 2", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
+                     label = c("5", "10", "∞", "10","5")) +
+  geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
@@ -199,8 +201,9 @@ RE1_oph <- oph_data %>%
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Right Eye 1", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
+                     label = c("5", "10", "∞", "10","5")) +
+  geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
@@ -217,8 +220,9 @@ RE2_oph <- oph_data %>%
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Right Eye 2", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-  geom_jitter(shape = 19, size = 2.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
+                     label = c("5", "10", "∞", "10","5")) +
+  geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
@@ -245,8 +249,9 @@ E1_LR_oph <- oph_data %>%
   scale_fill_manual(values=c("#009E73", "#009E73", "#E69F00",  "#E69F00", "#D55E00", "#D55E00")) +
   labs(title=NULL,x="Eye 1", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Left', 'Right', 'Left', 'Right', 'Left', 'Right')) +
-  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
+                     label = c("5", "10", "∞", "10","5")) +
+  geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
@@ -278,8 +283,9 @@ E2_LR_oph <- oph_data %>%
   scale_fill_manual(values=c("#009E73", "#009E73", "#E69F00", "#E69F00", "#D55E00", "#D55E00")) +
   labs(title=NULL,x="Eye 2", y = "Object distance (mm)") +
   scale_x_discrete(labels = c('Left', 'Right', 'Left', 'Right', 'Left', 'Right')) +
-  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
+                     label = c("5", "10", "∞", "10","5")) +
+  geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
@@ -358,10 +364,9 @@ y.grob <- textGrob("Object distance (mm)",
                              fontsize = 30), rot = 90)
 
 #print graph
-pdf(file = "Figures/ophthalmoscope_long.pdf", width = 12,  height = 9)
+cairo_pdf(file = "Figures/ophthalmoscope_long.pdf", width = 12,  height = 9) # cairo_pdf is able to handle special characters
 grid.arrange(arrangeGrob(long_plot, left = y.grob)) #adding common y axis label to plot
 dev.off()
-
 ```
 
 ## Relative Edge Sharpness 
@@ -482,7 +487,7 @@ LE1_focal <- focal_data %>%
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   labs(title=NULL,x="Left Eye 1", y = "Back focal length") +
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
@@ -498,7 +503,7 @@ LE2_focal <- focal_data %>%
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   labs(title=NULL,x="Left Eye 2", y = "Back focal length") +
-  geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
@@ -513,7 +518,7 @@ RE1_focal <- focal_data %>%
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   labs(title=NULL,x="Right Eye 1", y = "Back focal length") +
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
@@ -530,7 +535,7 @@ RE2_focal <- focal_data %>%
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
   labs(title=NULL,x="Right Eye 2", y = "Back focal length") +
-  geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
@@ -726,13 +731,14 @@ Normal light
 ### separate probes
 
 ## horizontal arena
-latency_horizontal <- behaviour_data %>%
+latency_horizontal_separate <- behaviour_data %>%
   drop_na(latency_min) %>%
   filter(arena == "horizontal" & light_environment == "normal") %>%
   ggplot(aes(y= latency_min, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -740,16 +746,17 @@ latency_horizontal <- behaviour_data %>%
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 30, face = "bold"),
                                  legend.position = "none")
-latency_horizontal
+latency_horizontal_separate
 
 ## vertical arena
-latency_vertical <- behaviour_data %>%
+latency_vertical_separate <- behaviour_data %>%
   drop_na(latency_min) %>%
   filter(arena == "vertical" & light_environment == "normal") %>%
   ggplot(aes(y= latency_min, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -757,7 +764,7 @@ latency_vertical <- behaviour_data %>%
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 25, face = "bold"),
                                  legend.position = "none")
-latency_vertical
+latency_vertical_separate
 
 ### pooled probes
 
@@ -769,6 +776,7 @@ latency_horizontal_pooled <- behaviour_data %>%
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
   scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", # adds a significance bar
@@ -788,6 +796,7 @@ latency_vertical_pooled <- behaviour_data %>%
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
   scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", 
@@ -967,6 +976,7 @@ dark_latency_horizontal_separate <- behaviour_data %>%
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -984,6 +994,7 @@ dark_latency_vertical_separate <- behaviour_data %>%
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -1003,6 +1014,7 @@ dark_latency_horizontal_pooled <- behaviour_data %>%
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
   scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   geom_signif(comparisons=list(c("control", "lens3")), annotations="*", # adds a significance star
@@ -1022,6 +1034,7 @@ dark_latency_vertical_pooled <- behaviour_data %>%
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
   scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   geom_signif(comparisons=list(c("control", "lens3")), annotations="*", # adds a significance star
@@ -1065,7 +1078,7 @@ fig.d <- dark_latency_vertical_pooled +
 
 fig.d
 
-#use cowplot package to nicely plot the graphs together with a shared common legend.
+# use cowplot package to nicely plot the graphs together with a shared common legend.
 latency_plot <- plot_grid(fig.a, fig.c, fig.b, fig.d, 
                    #list of plots to arrange in grid
                    rel_widths = c(6, 6, 6, 6),
