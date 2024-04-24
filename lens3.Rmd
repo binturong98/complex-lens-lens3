@@ -274,6 +274,26 @@ E1_LR_oph <- E1_LR_oph + theme(strip.background = element_rect(size = 1.5, linet
 
 E1_LR_oph
 
+# Adding colours to facet labels
+
+# First removing the y axis label because I cannot for the life of me figure out why this isn't straightforward to do with theme() after converting the grob back to a ggplot object.
+
+E1_LR_oph_fig <- E1_LR_oph + theme(axis.title.y = element_blank())
+
+E1_g <- ggplot_gtable(ggplot_build(E1_LR_oph_fig)) # converting the ggplot list to a grob and modifying it
+strip_t <- which(grepl('strip-', E1_g$layout$name))
+fills <- c("#009E73","#E69F00","#D55E00")
+k <- 1
+for (i in strip_t) {
+j <- which(grepl('rect', E1_g$grobs[[i]]$grobs[[1]]$childrenOrder))
+E1_g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+k <- k+1
+}
+grid.draw(E1_g)
+
+# Converting the grob to a ggplot object to align plots with cowplot
+E1_LR_oph_fig <- as.ggplot(E1_g) 
+
 # Plot for all E2s
 
 E2_LR_oph <- oph_data %>%
@@ -293,11 +313,10 @@ E2_LR_oph <- oph_data %>%
                                  legend.position = "none")
 E2_LR_oph 
 
-# Trying custom facet grid labels and using the labeller function
+# Trying custom facet grid labels using the labeller function
 probe.labs <- c("control" = "Control","lens3_191" = "Probe 1", "lens3_249" = "Probe 2")
 
 # Trying to make multilevel x-axes
-
 E2_LR_oph <- E2_LR_oph + facet_grid(~ probe, scales = "free", labeller = labeller(probe = probe.labs)) 
 
 # Changing text size of facet grid labels
@@ -334,14 +353,16 @@ wide_plot <- plot_grid(fig.a, NULL, fig.b,
 plot_grid(wide_plot)
 
 #print graph
-pdf(file = "Figures/ophthalmoscope_wide.pdf", width = 12,  height = 6)
+cairo_pdf(file = "Figures/ophthalmoscope_wide.pdf", width = 12,  height = 6) # cairo_pdf is able to handle special characters
 wide_plot
 dev.off()
 
 # stacking the plots on top of each other instead of putting them side to side
-fig.a <- E1_LR_oph +
+fig.a <- E1_LR_oph_fig +
 theme(legend.position = "none",
-      axis.title.y = element_blank())
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank()) +
+  labs(y = NULL)
 
 fig.a
 
@@ -354,7 +375,7 @@ fig.b
 
 #combining plots
 
-long_plot <- plot_grid(fig.a, fig.b,
+long_plot <- plot_grid(fig.a, fig.b, align = 'v', axis = 'r',
                        nrow = 2)
 plot_grid(long_plot)
 
