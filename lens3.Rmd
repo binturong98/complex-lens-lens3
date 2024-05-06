@@ -27,6 +27,8 @@ library(gridExtra)
 library(plotly)
 library(ggpubr)
 library(rstatix)
+library(ggplotify)
+library(Cairo)
 ```
 
 # Data and subsetting
@@ -260,7 +262,7 @@ E1_LR_oph <- oph_data %>%
 E1_LR_oph 
 
 # Trying custom facet grid labels and using the labeller function
-probe.labs <- c("control" = "Control","lens3_191" = "Probe 1", "lens3_249" = "Probe 2")
+probe.labs <- c("control" = "Control","lens3_191" = "lens3RNAi P1", "lens3_249" = "lens3RNAi P2")
 
 # Trying to make multilevel x-axes
 
@@ -312,9 +314,6 @@ E2_LR_oph <- oph_data %>%
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
 E2_LR_oph 
-
-# Trying custom facet grid labels using the labeller function
-probe.labs <- c("control" = "Control","lens3_191" = "Probe 1", "lens3_249" = "Probe 2")
 
 # Trying to make multilevel x-axes
 E2_LR_oph <- E2_LR_oph + facet_grid(~ probe, scales = "free", labeller = labeller(probe = probe.labs)) 
@@ -1169,7 +1168,15 @@ edge_model_control_LE2 <- lm(contrast ~ distance,
                              data = edge_data,
                              subset = eye_probe == "LE2_control")
 
-# kruskal.test(edge_model_249_LE2, edge_model_control_LE2, edge_model_191_LE2)
+edge_model_191_LE2 <- lm(contrast ~ distance,
+                             data = edge_data,
+                             subset = eye_probe == "LE2_lens3_191")
+
+edge_model_249_LE2 <- lm(contrast ~ distance,
+                             data = edge_data,
+                             subset = eye_probe == "LE2_lens3_249")
+
+kruskal.test(edge_model_249_LE2, edge_model_control_LE2, edge_model_191_LE2)
 
 ```
 
