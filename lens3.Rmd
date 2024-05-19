@@ -166,7 +166,7 @@ LE1_oph <- oph_data %>%
   geom_boxplot(alpha = 0.8) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Left Eye 1", y = "Object distance (mm)") +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
                      label = c("5", "10", "∞", "10","5")) + # reciprocal for image distance
   geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -184,7 +184,7 @@ LE2_oph <- oph_data %>%
   geom_boxplot(alpha = 0.8) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Left Eye 2", y = "Object distance (mm)") +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
                      label = c("5", "10", "∞", "10","5")) +
   geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -202,7 +202,7 @@ RE1_oph <- oph_data %>%
   geom_boxplot(alpha = 0.8) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Right Eye 1", y = "Object distance (mm)") +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
                      label = c("5", "10", "∞", "10","5")) +
   geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -221,7 +221,7 @@ RE2_oph <- oph_data %>%
   geom_boxplot(alpha = 0.8, outlier.shape = 17, outlier.size = 2, position = "dodge2") + # Changing outlier shape
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Right Eye 2", y = "Object distance (mm)") +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
                      label = c("5", "10", "∞", "10","5")) +
   geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -404,9 +404,9 @@ LE1_edge_plot <- edge_data %>%
   ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
   #geom_point() +
   stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) +
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from Back Surface of Lens", 
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_x_continuous("Distance from Back Surface of Lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
   scale_y_continuous("Relative Edge Sharpness",
@@ -425,9 +425,9 @@ LE2_edge_plot <- edge_data %>%
   ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
   #geom_point() +
   stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe))+
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "Probe 1", "Probe 2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from Back Surface of Lens", 
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_x_continuous("Distance from Back Surface of Lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
   scale_y_continuous("Relative Edge Sharpness",
@@ -435,7 +435,7 @@ LE2_edge_plot <- edge_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 25, face = "bold"),
         legend.title = element_blank(),
         legend.text = element_text(size = 15))
 LE2_edge_plot 
@@ -448,7 +448,7 @@ RE1_edge_plot <- edge_data %>%
    stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) + 
   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
   scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_continuous("Distance from Back Surface of Lens", 
+  scale_x_continuous("Distance from Back Surface of Lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
   scale_y_continuous("Relative Edge Sharpness",
@@ -468,7 +468,7 @@ RE2_edge_plot <- edge_data %>%
   stat_smooth(span = 0.005, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) + 
   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
   scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_continuous("Distance from Back Surface of Lens", 
+  scale_x_continuous("Distance from Back Surface of Lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
   scale_y_continuous("Relative Edge Sharpness",
@@ -489,7 +489,7 @@ RE2_edge_plot
 
 ```{r edge sharpness figure}
 
-pdf(file = "Figures/LE2_edge_sharpness.pdf", width = 8,  height = 6)
+pdf(file = "Figures/LE2_edge_sharpness.pdf", width = 9,  height = 6)
 LE2_edge_plot
 dev.off()
 
@@ -505,8 +505,8 @@ LE1_focal <- focal_data %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x="Left Eye 1", y = "Back focal length") +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  labs(title=NULL,x="Left Eye 1", y = "Back focal length (µm)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
@@ -521,13 +521,13 @@ LE2_focal <- focal_data %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  labs(title=NULL,x="Left Eye 2", y = "Back focal length") +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  labs(title=NULL,x="Left Eye 2", y = "Back focal length (µm)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 25, face = "bold"),
                                  legend.position = "none")
 LE2_focal
 
@@ -536,7 +536,7 @@ RE1_focal <- focal_data %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x="Right Eye 1", y = "Back focal length") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -553,7 +553,7 @@ RE2_focal <- focal_data %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x="Right Eye 2", y = "Back focal length") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -604,7 +604,7 @@ missed_strikes_horizontal <- behaviour_data %>%
   ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Missed Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -620,7 +620,7 @@ missed_strikes_vertical <- behaviour_data %>%
   ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Missed Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -641,7 +641,7 @@ succesful_strikes_horizontal <- behaviour_data %>%
   ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Succesful Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -657,7 +657,7 @@ succesful_strikes_vertical <- behaviour_data %>%
   ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Succesful Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -672,16 +672,18 @@ succesful_strikes_vertical
 Normal light
 ```{r normal light hunting success}
 
+### separate probes
+
 ## horizontal arena
 hunting_horizontal <- behaviour_data %>%
   filter(arena == "horizontal" & light_environment == "normal") %>%
   ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "% Hunting success") +
   geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center', # using geom_dotplot here instead of geom_jitter so that the points are stacked horizontally and centre aligned (stackdir). Important as there are only 3 values for hunting success and geom_jitter makes it seem like there are more.
-        stackratio = 1.5, dotsize = 0.7, position = position_dodge(0.8)) + #stackratio adjusts distance between points 
+        stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) + #stackratio adjusts distance between points 
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
@@ -695,16 +697,55 @@ hunting_vertical <- behaviour_data %>%
   ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "% Hunting success") +
   geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
-        stackratio = 1.5, dotsize = 0.7, position = position_dodge(0.8)) + 
+        stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 30, face = "bold"),
         legend.position = "none")
 hunting_vertical
+
+### pooled probes
+
+## horizontal arena
+hunting_horizontal_pooled <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "normal") %>%
+  ggplot(aes(y = hunting_success, x = group, fill = group)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+   scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
+  #scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) + ## tried to write this piece of code to selectively italicise lens3 but for some reason it doesn't italicise numbers and also creates a space between lens3 and RNAi. 
+  labs(title=NULL,x= "", y = "% Hunting success") +
+  geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
+        stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text.y = element_text(size = 30, face = "bold"),
+        axis.text.x = element_text(size = 30),
+        legend.position = "none")
+hunting_horizontal_pooled
+
+## vertical
+hunting_vertical_pooled <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "normal") %>%
+  ggplot(aes(y = hunting_success, x = group, fill = group)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
+  labs(title=NULL,x= "", y = "% Hunting success") +
+  geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
+        stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+        axis.text.y = element_text(size = 30, face = "bold"),
+        axis.text.x = element_text(size = 30),
+        legend.position = "none")
+hunting_vertical_pooled
 ```
 
 ### Total strikes 
@@ -717,7 +758,7 @@ total_strikes_horizontal <- behaviour_data %>%
   ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Total Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -733,7 +774,7 @@ total_strikes_vertical <- behaviour_data %>%
   ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Total Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -757,7 +798,7 @@ latency_horizontal_separate <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -775,7 +816,7 @@ latency_vertical_separate <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -795,16 +836,18 @@ latency_horizontal_pooled <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", # adds a significance bar
-              map_signif_level = TRUE, textsize = 5, vjust = -0.1) +
+  #geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", # adds a significance bar
+              #map_signif_level = TRUE, textsize = 5, vjust = -0.1) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 30, face = "bold"),
+         axis.text.y = element_text(size = 30, face = "bold"),
+         axis.text.y = element_text(size = 30, face = "bold"),
+        axis.text.x = element_text(size = 30),
                                  legend.position = "none")
 latency_horizontal_pooled
 
@@ -815,16 +858,18 @@ latency_vertical_pooled <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", 
-              map_signif_level = TRUE, textsize = 5, vjust = -0.1) +
+  #geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", 
+              #map_signif_level = TRUE, textsize = 5, vjust = -0.1) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 30, face = "bold"),
+         axis.text.y = element_text(size = 30, face = "bold"),
+         axis.text.y = element_text(size = 30, face = "bold"),
+        axis.text.x = element_text(size = 30),
                                  legend.position = "none")
 latency_vertical_pooled
 ```
@@ -842,7 +887,7 @@ dark_missed_strikes_horizontal <- behaviour_data %>%
   ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Missed Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -858,7 +903,7 @@ dark_missed_strikes_vertical <- behaviour_data %>%
   ggplot(aes(y= missed_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Missed Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -879,7 +924,7 @@ dark_succesful_strikes_horizontal <- behaviour_data %>%
   ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Succesful Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -895,7 +940,7 @@ dark_succesful_strikes_vertical <- behaviour_data %>%
   ggplot(aes(y= succesful_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Succesful Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -910,16 +955,18 @@ dark_succesful_strikes_vertical
 Dark
 ```{r dark hunting success}
 
+### separate probes
+
 ## horizontal arena
 dark_hunting_horizontal <- behaviour_data %>%
   filter(arena == "horizontal" & light_environment == "dark") %>%
   ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "% Hunting success") +
   geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
-        stackratio = 1.5, dotsize = 0.7, position = position_dodge(0.8)) +
+        stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
@@ -933,16 +980,54 @@ dark_hunting_vertical <- behaviour_data %>%
   ggplot(aes(y = hunting_success, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "% Hunting success") +
   geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
-        stackratio = 1.5, dotsize = 0.7, position = position_dodge(0.8)) + 
+        stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 30, face = "bold"),
         legend.position = "none")
 dark_hunting_vertical
+
+### pooled probes
+
+## horizontal arena
+dark_hunting_horizontal_pooled <- behaviour_data %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(y = hunting_success, x = group, fill = group)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+   scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
+  labs(title=NULL,x= "", y = "% Hunting success") +
+  geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
+        stackratio = 1.5, dotsize = 1.5, position = position_dodge(0.8)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+         axis.text.y = element_text(size = 30, face = "bold"),
+        axis.text.x = element_text(size = 30),
+        legend.position = "none")
+dark_hunting_horizontal_pooled
+
+## vertical
+dark_hunting_vertical_pooled <- behaviour_data %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(y = hunting_success, x = group, fill = group)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
+  scale_fill_manual(values=c("#009E73", "#CC79A7")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
+  labs(title=NULL,x= "", y = "% Hunting success") +
+  geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
+        stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+         axis.text.y = element_text(size = 30, face = "bold"),
+        axis.text.x = element_text(size = 30),
+        legend.position = "none")
+dark_hunting_vertical_pooled
 ```
 
 ### Total strikes
@@ -955,7 +1040,7 @@ dark_total_strikes_horizontal <- behaviour_data %>%
   ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Total Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -971,7 +1056,7 @@ dark_total_strikes_vertical <- behaviour_data %>%
   ggplot(aes(y= total_strikes, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   labs(title=NULL,x= "", y = "Total Strikes") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
@@ -995,7 +1080,7 @@ dark_latency_horizontal_separate <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -1013,7 +1098,7 @@ dark_latency_vertical_separate <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -1033,16 +1118,19 @@ dark_latency_horizontal_pooled <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   geom_signif(comparisons=list(c("control", "lens3")), annotations="*", # adds a significance star
-              map_signif_level = TRUE, textsize = 10, vjust = 0.5) +
+              map_signif_level = TRUE, textsize = 10, 
+              vjust = 0.5,
+              margin_top = 0.35) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 30, face = "bold"),
+         axis.text.y = element_text(size = 30, face = "bold"),
+        axis.text.x = element_text(size = 30),
                                  legend.position = "none")
 dark_latency_horizontal_pooled
 
@@ -1053,23 +1141,26 @@ dark_latency_vertical_pooled <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   geom_signif(comparisons=list(c("control", "lens3")), annotations="*", # adds a significance star
-              map_signif_level = TRUE, textsize = 10, vjust = 0.5) +
+              map_signif_level = TRUE, textsize = 10, 
+              vjust = 0.5,
+              margin_top = 0.35) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 30, face = "bold"),
+         axis.text.y = element_text(size = 30, face = "bold"),
+        axis.text.x = element_text(size = 30),
                                  legend.position = "none")
 dark_latency_vertical_pooled
 ```
 
-```{r latency figure}
+```{r behaviour figure}
 
-#make panels 
+#make latency panels 
 fig.a <- latency_horizontal_pooled +
   labs(y = NULL) +
   theme(legend.position = "none") +
@@ -1108,15 +1199,66 @@ latency_plot <- plot_grid(fig.a, fig.c, fig.b, fig.d,
 
 plot_grid(latency_plot)
 
-y.grob <- textGrob("Latency (min)",
+y.grob.latency <- textGrob("Latency (min)",
                    just = "left", hjust = 0.4, vjust = 0.4,
                    gp = gpar(fontface = "bold",
                              fontsize = 30), rot = 90)
 
+latency_plot_axis <- grid.arrange(arrangeGrob(latency_plot, left = y.grob.latency)) #adding common y axis
+
+
+#make hunting success panels 
+fig.e <- hunting_horizontal_pooled +
+  labs(y = NULL) +
+  theme(legend.position = "none") +
+  coord_cartesian(clip = "off") 
+
+fig.e
+
+fig.f <- hunting_vertical_pooled +
+  labs(y = NULL) +
+  theme(legend.position = "none") +
+  coord_cartesian(clip = "off")
+
+fig.f
+
+fig.g <- dark_hunting_horizontal_pooled +
+  labs(y = NULL) +
+  theme(legend.position = "none") +
+  coord_cartesian(clip = "off") 
+
+fig.g
+
+fig.h <- dark_hunting_vertical_pooled +
+  labs(y = NULL) +
+  theme(legend.position = "none") +
+  coord_cartesian(clip = "off")
+
+fig.h
+
+# use cowplot package to nicely plot the graphs together with a shared common legend.
+hunting_plot <- plot_grid(fig.e, fig.f, fig.g, fig.h, 
+                   #list of plots to arrange in grid
+                   rel_widths = c(6, 6, 6, 6),
+                   axis = c("b", "b", "b", "b"),
+                   ncol = 2,
+                   vjust = 1) 
+
+plot_grid(hunting_plot)
+
+y.grob.hunting <- textGrob("% Hunting success",
+                   just = "left", hjust = 0.4, vjust = 0.4,
+                   gp = gpar(fontface = "bold",
+                             fontsize = 30), rot = 90)
+
+hunting_plot_axis <- grid.arrange(arrangeGrob(hunting_plot, left = y.grob.hunting)) #adding common y axis
+
+behaviour_figure <- grid.arrange(arrangeGrob(latency_plot_axis, hunting_plot_axis, nrow = 2))
 
 #print graph
-pdf(file = "Figures/latency.pdf", width = 15,  height = 9)
-grid.arrange(arrangeGrob(latency_plot, left = y.grob)) #adding common y axis label to plot
+pdf(file = "Figures/behaviour.pdf", width = 15,  height = 16)
+grid.arrange(arrangeGrob(latency_plot_axis, hunting_plot_axis,
+                         nrow = 2)) #stacking the latency and hunting success plots on top of each other
 dev.off()
 
 ```
@@ -1176,7 +1318,7 @@ edge_model_249_LE2 <- lm(contrast ~ distance,
                              data = edge_data,
                              subset = eye_probe == "LE2_lens3_249")
 
-kruskal.test(edge_model_249_LE2, edge_model_control_LE2, edge_model_191_LE2)
+#kruskal.test(edge_model_249_LE2, edge_model_control_LE2, edge_model_191_LE2)
 
 ```
 
@@ -1399,3 +1541,49 @@ res_latency_dark_vertical_pooled_t
 # significant!!
 ```
 
+### Hunting success pooled probes
+```{r dark behaviour latency stats pooled probes}
+
+## Horizontal
+# Building the linear model
+pooled_hunting_model_hor_dark <- lm(hunting_success ~ group, 
+                                    data = behaviour_data, 
+                                    subset = (light_environment == 'dark' & arena == 'horizontal'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(pooled_hunting_model_hor_dark))
+
+# Test for normality
+shapiro_test(residuals(pooled_hunting_model_hor_dark))
+# p < 0.05 so can't assume normality - as expected 
+
+
+## Vertical
+# Building the linear model
+pooled_hunting_model_ver_dark <- lm(hunting_success ~ group, 
+                                    data = behaviour_data, 
+                                    subset = (light_environment == 'dark' & arena == 'vertical'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(pooled_hunting_model_ver_dark))
+
+# Test for normality
+shapiro_test(residuals(pooled_hunting_model_ver_dark))
+# p > 0.05 so can't assume normality - as expected 
+
+# horizontal test
+res_hunting_dark_horizontal_pooled_wil <- behaviour_data %>%
+  filter(light_environment == 'dark', arena == 'horizontal') %>%
+  wilcox_test(hunting_success ~ group)
+
+res_hunting_dark_horizontal_pooled_wil
+# not significant
+
+# vertical test
+res_hunting_dark_vertical_pooled_wil <- behaviour_data %>%
+  filter(light_environment == 'dark', arena == 'vertical') %>%
+  wilcox_test(hunting_success ~ group)
+
+res_hunting_dark_vertical_pooled_wil
+# not significant
+```
