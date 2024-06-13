@@ -58,7 +58,7 @@ behaviour_data <- read.csv("lens3_behaviour.csv", header = TRUE)
 
 # na.strings converts "NA", "" and " " into na within the body of the file
 
-# colourblind friendly palette
+# Colourblind friendly palette
 palette.colors(palette = "Okabe-Ito")
 ```
 
@@ -159,7 +159,7 @@ palette.colors(palette = "Okabe-Ito")
 
 ```{r individual eye boxplots}
 
-#LE1
+# LE1
 LE1_oph <- oph_data %>%
   filter(eye == "LE1") %>%
   ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
@@ -177,7 +177,7 @@ LE1_oph <- oph_data %>%
                                  legend.position = "none")
 LE1_oph
 
-#LE2
+# LE2
 LE2_oph <- oph_data %>%
   filter(eye == "LE2") %>%
   ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
@@ -195,7 +195,7 @@ LE2_oph <- oph_data %>%
                                  legend.position = "none")
 LE2_oph
 
-#RE1
+# RE1
 RE1_oph <- oph_data %>%
   filter(eye == "RE1") %>%
   ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
@@ -213,7 +213,7 @@ RE1_oph <- oph_data %>%
                                  legend.position = "none")
 RE1_oph
 
-#RE2
+# RE2
 
 RE2_oph <- oph_data %>%
   filter(eye == "RE2") %>%
@@ -329,7 +329,7 @@ E2_LR_oph
 ```
 
 ```{r ophthalmoscope figure}
-#make panels 
+# Make panels 
 fig.a <- E1_LR_oph +
 theme(legend.position = "none")
 
@@ -342,7 +342,7 @@ theme(legend.position = "none") +
 
 fig.b
 
-#use cowplot package to nicely plot the graphs together with a shared common legend.
+# Use cowplot package to nicely plot the graphs together with a shared common legend.
 wide_plot <- plot_grid(fig.a, NULL, fig.b, 
                    #list of plots to arrange in grid
                    rel_widths = c(6, 0.2, 6),
@@ -351,12 +351,12 @@ wide_plot <- plot_grid(fig.a, NULL, fig.b,
 
 plot_grid(wide_plot)
 
-#print graph
+# Print graph
 cairo_pdf(file = "Figures/ophthalmoscope_wide.pdf", width = 12,  height = 6) # cairo_pdf is able to handle special characters
 wide_plot
 dev.off()
 
-# stacking the plots on top of each other instead of putting them side to side
+# Stacking the plots on top of each other instead of putting them side to side
 fig.a <- E1_LR_oph_fig +
 theme(legend.position = "none",
       axis.title.y = element_blank(),
@@ -372,38 +372,48 @@ theme(legend.position = "none",
 
 fig.b
 
-#combining plots
+# Combining plots
 
 long_plot <- plot_grid(fig.a, fig.b, align = 'v', axis = 'r',
                        nrow = 2)
 plot_grid(long_plot)
 
-#creating common y axis label
+# Creating common y axis label
 y.grob <- textGrob("Object distance (mm)", 
                    gp = gpar(fontface = "bold",
                              fontsize = 30), rot = 90)
 
-#print graph
+# Print graph
 cairo_pdf(file = "Figures/ophthalmoscope_long.pdf", width = 12,  height = 9) # cairo_pdf is able to handle special characters
 grid.arrange(arrangeGrob(long_plot, left = y.grob)) #adding common y axis label to plot
 dev.off()
 ```
 
 ## Relative Edge Sharpness 
+
+Comparing the relative edge sharpness curves across groups using LOESS, which is a locally weighted scatterplot smoother. The method fits a smooth line through data by fitting weighted least squares (WLS) models to observations within a user-specified window of the focal point, whose width (span) is typically expressed as a proportion α of the n data points. The ribbon is representative of standard error.  
+
 ```{r relative edge sharpness plots}
 
 # Creating new column with the eye and probe identity
 edge_data <- edge_data %>%
   mutate(eye_probe = paste(eye, probe, sep="_"))
 
-# individual eye line plots
+# Trimming dataset to 550 µm for consistency
+edge_data <- edge_data %>%
+  filter(distance <= 600)
 
-#LE1
+# Individual eye plots
+
+# LE1
 LE1_edge_plot <- edge_data %>%
   filter(eye == "LE1") %>%
   ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
   #geom_point() +
-  stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) +
+  stat_smooth(span = 0.1, se = TRUE,
+              method = 'loess',
+              formula = 'y ~ x',
+              aes(fill = eye_probe, colour = eye_probe)) +
   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
   scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
   scale_x_continuous("Distance from Back Surface of Lens (µm)", 
@@ -419,12 +429,15 @@ LE1_edge_plot <- edge_data %>%
         legend.text = element_text(size = 15))
 LE1_edge_plot 
 
-#LE2
+# LE2
 LE2_edge_plot <- edge_data %>%
   filter(eye == "LE2") %>%
   ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
   #geom_point() +
-  stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe))+
+  stat_smooth(span = 0.1, se = TRUE,
+              method = 'loess',
+              formula = 'y ~ x',
+              aes(fill = eye_probe, colour = eye_probe))+
   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
   scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
   scale_x_continuous("Distance from Back Surface of Lens (µm)", 
@@ -440,32 +453,39 @@ LE2_edge_plot <- edge_data %>%
         legend.text = element_text(size = 15))
 LE2_edge_plot 
 
-#RE1
+# RE1
 RE1_edge_plot <- edge_data %>%
   filter(eye == "RE1") %>%
   ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
   #geom_point() +
-   stat_smooth(span = 0.1, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) + 
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
+  stat_smooth(span = 0.1, se = TRUE, 
+              method = 'loess',
+              formula = 'y ~ x',
+              aes(fill = eye_probe, colour = eye_probe)) +
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
   scale_x_continuous("Distance from Back Surface of Lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
   scale_y_continuous("Relative Edge Sharpness",
-                     breaks = c(1, 2, 3, 4)) +
+                     breaks = c(1, 1.5, 2.5, 3.5)) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
-        legend.position = "none")
+        legend.title = element_blank(),
+        legend.text = element_text(size = 15))
 RE1_edge_plot 
 
-#RE2
+# RE2
 RE2_edge_plot <- edge_data %>%
   filter(eye == "RE2") %>%
   ggplot(aes(y= contrast, x = distance, group = eye_probe, colour = eye_probe)) +
   #geom_point() +
-  stat_smooth(span = 0.005, se = TRUE, aes(fill = eye_probe, colour = eye_probe)) + 
+  stat_smooth(span = 0.1, se = TRUE,
+              method = 'loess',
+              formula = 'y ~ x',
+              aes(fill = eye_probe, colour = eye_probe)) + 
   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
   scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_continuous("Distance from Back Surface of Lens (µm)", 
@@ -480,11 +500,27 @@ RE2_edge_plot <- edge_data %>%
         legend.position = "none")
 RE2_edge_plot 
 
+# individual plots
+individual_edge_plot <- edge_data %>%
+  filter(individual == "249_11") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye)) +
+  geom_point(aes(fill = eye_probe, colour = eye_probe)) +
+  scale_colour_manual(values = c("#56B4E9", "#E69F00", "#0072B2", "#D55E00")) +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#0072B2", "#D55E00")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_x_continuous("Distance from Back Surface of Lens (µm)") +
+  scale_y_continuous("Relative Edge Sharpness") +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 15, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 15, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 15, face = "bold"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 15))
+individual_edge_plot 
+
 # Unused but useful bit of code
 # Melting the data by distance to make it long format edge_data <- melt(edge_data, id.vars = "distance", value.name = "contrast")
 
 # Pulling information from rows and trying to organise it into a new column: edge_data_long$left <- str_detect(edge_data_long$variable, "L") 
-
 ```
 
 ```{r edge sharpness figure}
@@ -1303,22 +1339,7 @@ summary(res_oph_kw)
 ## Edge sharpness series
 ```{r edge sharpness stats}
 
-# Building linear models for each eye
 
-# LE2
-edge_model_control_LE2 <- lm(contrast ~ distance,
-                             data = edge_data,
-                             subset = eye_probe == "LE2_control")
-
-edge_model_191_LE2 <- lm(contrast ~ distance,
-                             data = edge_data,
-                             subset = eye_probe == "LE2_lens3_191")
-
-edge_model_249_LE2 <- lm(contrast ~ distance,
-                             data = edge_data,
-                             subset = eye_probe == "LE2_lens3_249")
-
-#kruskal.test(edge_model_249_LE2, edge_model_control_LE2, edge_model_191_LE2)
 
 ```
 
