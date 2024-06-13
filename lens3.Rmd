@@ -416,10 +416,10 @@ LE1_edge_plot <- edge_data %>%
               aes(fill = eye_probe, colour = eye_probe)) +
   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
   scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from Back Surface of Lens (µm)", 
+  scale_x_continuous("Distance from back surface of lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
-  scale_y_continuous("Relative Edge Sharpness",
+  scale_y_continuous("Relative edge sharpness",
                      breaks = c(1, 1.5, 2.5, 3.5)) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
@@ -440,10 +440,10 @@ LE2_edge_plot <- edge_data %>%
               aes(fill = eye_probe, colour = eye_probe))+
   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
   scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from Back Surface of Lens (µm)", 
+  scale_x_continuous("Distance from back surface of lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
-  scale_y_continuous("Relative Edge Sharpness",
+  scale_y_continuous("Relative edge sharpness",
                      breaks = c(1, 2, 3, 4)) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
@@ -464,10 +464,10 @@ RE1_edge_plot <- edge_data %>%
               aes(fill = eye_probe, colour = eye_probe)) +
   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
   scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from Back Surface of Lens (µm)", 
+  scale_x_continuous("Distance from back surface of lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
-  scale_y_continuous("Relative Edge Sharpness",
+  scale_y_continuous("Relative edge sharpness",
                      breaks = c(1, 1.5, 2.5, 3.5)) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
@@ -488,10 +488,10 @@ RE2_edge_plot <- edge_data %>%
               aes(fill = eye_probe, colour = eye_probe)) + 
   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
   scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_continuous("Distance from Back Surface of Lens (µm)", 
+  scale_x_continuous("Distance from back surface of lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
-  scale_y_continuous("Relative Edge Sharpness",
+  scale_y_continuous("Relative edge sharpness",
                      breaks = c(1, 2, 3, 4)) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
@@ -502,13 +502,13 @@ RE2_edge_plot
 
 # individual plots
 individual_edge_plot <- edge_data %>%
-  filter(individual == "249_11") %>%
+  filter(individual == "249_18") %>%
   ggplot(aes(y= contrast, x = distance, group = eye)) +
   geom_point(aes(fill = eye_probe, colour = eye_probe)) +
   scale_colour_manual(values = c("#56B4E9", "#E69F00", "#0072B2", "#D55E00")) +
   scale_fill_manual(values = c("#56B4E9", "#E69F00", "#0072B2", "#D55E00")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from Back Surface of Lens (µm)") +
-  scale_y_continuous("Relative Edge Sharpness") +
+  scale_x_continuous("Distance from back surface of lens (µm)") +
+  scale_y_continuous("Relative edge sharpness") +
   theme_classic() +
   theme(axis.title.x = element_text(size = 15, face = "bold", vjust = -1.2),
         axis.title.y = element_text(size = 15, face = "bold", vjust = 1.8),
@@ -531,18 +531,90 @@ dev.off()
 
 ```
 
+Comparing maximum edge sharpness values between controls and tests. This usually corresponds to the second peak/image. However, sometimes the first peak has higher edge sharpness in the knockdowns; That's some of the eyes of 3/10 individuals for Probe 1 and 4/10 individuals for Probe 2. In some eyes of 2/10 Probe 2 individuals, best focused images could not be detected in the edge sharpness plots or manually
+
+```{r maximum edge sharpness boxplots}
+
+# LE1
+LE1_max_edge <- focal_data %>%
+  filter(eye == "LE1") %>%
+  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  labs(title=NULL,x="Left eye 1", y = "Maximum edge sharpness") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+LE1_max_edge
+
+# LE2
+LE2_max_edge <- focal_data %>%
+  filter(eye == "LE2") %>%
+  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  labs(title=NULL,x="Left eye 2", y = "Maximum edge sharpness") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+LE2_max_edge
+
+# RE1
+LE2_max_edge <- focal_data %>%
+  filter(eye == "RE1") %>%
+  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  labs(title=NULL,x="Right eye 1", y = "Maximum edge sharpness") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+LE2_max_edge
+
+# RE2
+RE2_max_edge <- focal_data %>%
+  filter(eye == "RE2") %>%
+  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  labs(title=NULL,x="Right eye 2", y = "Maximum edge sharpness") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+RE2_max_edge
+
+# scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+# scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+```
+
 ## Back focal length
-Only using the 2nd (taller) peak for this because the 1st is often hard to detect, especially in knockdowns. Went through the image series side-by-side to verify these. 
+Only using the 2nd (typically taller) peak for this because the 1st is often hard to detect. Went through the image series side-by-side to verify these. 
 ```{r back focal length boxplots}
 
-#LE1
+# LE1
 LE1_focal <- focal_data %>%
   filter(eye == "LE1") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  labs(title=NULL,x="Left Eye 1", y = "Back focal length (µm)") +
+  labs(title=NULL,x="Left eye 1", y = "Back focal length (µm)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
@@ -551,14 +623,14 @@ LE1_focal <- focal_data %>%
                                  legend.position = "none")
 LE1_focal
 
-#LE2
+# LE2
 LE2_focal <- focal_data %>%
   filter(eye == "LE2") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  labs(title=NULL,x="Left Eye 2", y = "Back focal length (µm)") +
+  labs(title=NULL,x="Left eye 2", y = "Back focal length (µm)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
@@ -567,13 +639,14 @@ LE2_focal <- focal_data %>%
                                  legend.position = "none")
 LE2_focal
 
+# RE1
 RE1_focal <- focal_data %>%
   filter(eye == "RE1") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  labs(title=NULL,x="Right Eye 1", y = "Back focal length") +
+  labs(title=NULL,x="Right eye 1", y = "Back focal length") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
@@ -582,15 +655,14 @@ RE1_focal <- focal_data %>%
                                  legend.position = "none")
 RE1_focal
 
-
-#RE2
+# RE2
 RE2_focal <- focal_data %>%
   filter(eye == "RE2") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  labs(title=NULL,x="Right Eye 2", y = "Back focal length") +
+  labs(title=NULL,x="Right eye 2", y = "Back focal length") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
@@ -1339,7 +1411,35 @@ summary(res_oph_kw)
 ## Edge sharpness series
 ```{r edge sharpness stats}
 
+## Test for normality
 
+# Building the linear model
+edge_model <- lm(maximum_sharpness ~ probe, data = focal_data)
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(edge_model))
+
+# Test for normality
+shapiro_test(residuals(edge_model))
+# p < 0.05 so not assuming normality
+
+# Checking normality assumption by groups
+focal_data %>%
+  group_by(probe) %>%
+  shapiro_test(maximum_sharpness)
+# again p < 0.05 so not assuming normality
+
+# Creating QQ plots for each group level
+ggqqplot(focal_data, "maximum_sharpness", facet.by = "probe")
+# Control and Probe 1 look normal. Probe 2 is kinda wonky. But will proceed with Gaussian stats
+
+# Using an ANOVA test
+res_edge_kw <- compare_means(maximum_sharpness ~ probe, data = focal_data, 
+              group.by = "eye", method = 'kruskal.test')
+res_edge_kw
+
+summary(res_edge_kw)
+# Significant changes in maximum edge sharpness with lens3 knockdown - all eyes
 
 ```
 
