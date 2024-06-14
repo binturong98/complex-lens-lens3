@@ -635,7 +635,7 @@ LE2_focal <- focal_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 25, face = "bold"),
+        axis.text = element_text(size = 22, face = "bold"),
                                  legend.position = "none")
 LE2_focal
 
@@ -677,7 +677,7 @@ RE2_focal
 
 ```{r back focal length figure}
 
-pdf(file = "Figures/LE2_back_focal.pdf", width = 8.5,  height = 8.5)
+pdf(file = "Figures/LE2_back_focal.pdf", width = 8.8,  height = 8)
 LE2_focal
 dev.off()
 
@@ -1265,6 +1265,10 @@ dark_latency_vertical_pooled <- behaviour_data %>%
                                  legend.position = "none")
 dark_latency_vertical_pooled
 ```
+
+# Supplementary figures
+
+## Ophthalmoscope
 
 ```{r behaviour figure}
 
