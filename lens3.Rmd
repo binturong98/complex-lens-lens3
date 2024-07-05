@@ -1,6 +1,6 @@
 ---
-title: "Deconstructing a complex Lens - functional implications of key lens protein knockdown in *Thermonectus marmoratus*"
-authors: "Mitra AT., Rathore S., Jester A., Hyland-Brown R., Benoit JB., Stowasser A, Tomoyasu Y., Buschbeck EK."
+title: "Deconstructing a complex Lens - functional implications of cataract induction in an insect visual system"
+authors: "Mitra AT., Rathore S., Jester A., Hyland-Brown R., Hassert J., Benoit JB., Stowasser A, Tomoyasu Y., Buschbeck EK."
 date: "7 April 2024"
 output:
   html_document:
@@ -37,7 +37,7 @@ library(Cairo)
 
 Raw data files for the ophthalmoscope, edge sharpness and focal length contain one row for **each eye** sampled. For most individuals, there are four rows of data: Right eye 1 & eye 2 and left eye 1 & eye 2. 
 
-Raw data file for behaviour contains data from both the optimal and challenging light arenas.
+Raw data file for behaviour contains data from both the optimal and dim light/challenging light arenas.
 
 Not using lens3_hanging_drops.csv as this was the first set of data that were collected. The images are overexposed and positioning isnt' quite right. This makes focal length estimation unreliable.
 
@@ -45,13 +45,16 @@ Not using lens3_hanging_drops.csv as this was the first set of data that were co
 
 # Load raw data
 
-# Ophthalmoscope
-oph_data <- read.csv("lens3_ophthalmoscope.csv", header = TRUE)
+# qPCR
+qpcr_data <- read.csv("lens3_qPCR.csv", header = TRUE)
 
 # Hanging drops
-edge_data <- read.csv("edge_sharpness_long.csv", header = TRUE)
+edge_data <- read.csv("lens3_edge_sharpness_long.csv", header = TRUE)
 
 focal_data <- read.csv("back_focal_length.csv", header = TRUE)
+
+# Ophthalmoscope
+oph_data <- read.csv("lens3_ophthalmoscope.csv", header = TRUE)
 
 # Behaviour
 behaviour_data <- read.csv("lens3_behaviour.csv", header = TRUE)
@@ -62,98 +65,515 @@ behaviour_data <- read.csv("lens3_behaviour.csv", header = TRUE)
 palette.colors(palette = "Okabe-Ito")
 ```
 
-```{r unused plots & analyses, include=FALSE}
+# Figures
 
-#Calculating focal length
+## qPCR
 
-#Focal length can be estimated in two ways. The first is a calculation of effective focal length (F)-1) F = (image size / object size) * object distance. The effective focal length is an opitcal measurement given as the distance from a principal plane of an optical lens to its imaging plane - Edmund Optics
+Comparing lens3 expression using qPCR on whole-head cDNA.
+```{r qPCR plot}
 
-#The second is a calculation of back focal length (BFL)-2) BFL = (best object image# - best back surface of lens image#) * 5 * 1.33Multiplying by 5 because the images are taken at 5 um increments. 1.33 is the refractive index of water because these lenses view in water and are thus suspended in water for the hanging drop. The back focal length is a mechanical measurement given as the distance between the last surface of an optical lens to its image plane.
+# ATM & STR generated data only
 
-#Instead of picking the best focused image manually, back focal length can be estimated from the MATLAB code written by Annette in her current biology bifocal lens paper. This is arguably a more accurate and less biased way of estimating focal length.  
-
-#This is especially because lens3 RNAi causes cataracts which form blurry images which makes it really hard to pick out the best focused image manually. The code also captures that blurriness in the form of low image contrast curves. 
-#Calculating difference in size between the first and second images for each eye for each larva. 
-
-#From micrometer slide measured on the 20x objective, 100 um = 151.037 pixels so
-#pixel_size <- (100/151.037) = 0.6620894
-
-#Calculating image size in  um
-  #hang_data <- hang_data %>% 
-  #mutate(image_1_size = (image_1_size_pixels * pixel_size),
-         #image_2_size = (image_2_size_pixels * pixel_size)) 
- 
-#Size of grating in um
-  #object_size <- 10000
- 
-#Distance between grating and lens in um
-  #object_distance <- 125000
-  
-#Focal length in um
-#hang_data <- hang_data %>%
-  #mutate(focal_length_1 = ((image_1_size/object_size)*object_distance),
-         #focal_length_2 = ((image_1_size/object_size)*object_distance))
-
-#Calculating difference in image size
-#hang_data <- hang_data %>%
-  #mutate(image_size_diff = (image_2_size - image_1_size))
-
-
-#Visualising differences in focal length between groups. These are per image and per eye.
-
-#LE1 Image 1
-#LE1_image1_plot <- hang_data %>%
-  #filter(eye == "LE1") %>%
-  #ggplot(aes(y= focal_length_1, x = group, fill = group)) +
-  #geom_violin(trim = FALSE, alpha = 0.7) +
-  #scale_fill_manual(values=c("#009E73", "#E69F00")) +
-  #labs(title=NULL,x="Left Eye 1: Image 1", y = "Focal length (um)") +
-  #scale_x_discrete(labels = c('Control', "lens3 Injected")) +
-  #geom_boxplot(width=0.15, fill="white", outlier.alpha = 0)+
-  #geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
-  #theme_classic() +
-  #theme(text = element_text(size = rel(4)), legend.position = "none")
-  
-#LE1_image1_plot
-
-#LE1_image_size_plot <- hang_data %>%
-  #filter(eye == "LE1") %>%
-  #ggplot(aes(y= image_size_diff, x = group, fill = group)) +
-  #geom_violin(trim = FALSE, alpha = 0.7) +
-  #scale_fill_manual(values=c("#009E73", "#E69F00")) +
-  #labs(title=NULL,x="Left Eye 1", y = "Difference in image size") +
-  #scale_x_discrete(labels = c('Control', "lens3 Injected")) +
-  #geom_boxplot(width=0.15, fill="white", outlier.alpha = 0)+
-  #geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
-  #theme_classic() +
-  #theme(text = element_text(size = rel(4)), legend.position = "none")
-  
-#LE1_image_size_plot
-
-## Right & left combined boxplots - DO NOT USE - see below
-
-#E1: both probes vs controls
-#E1_oph <- oph_data %>%
-  #filter(eye == "LE1" | eye == "RE1") %>%
-  #ggplot(aes(y= bestimagereciprocal, x = probe, fill = probe)) +
-  #geom_boxplot(alpha = 0.8) +
-  #scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  #labs(title=NULL,x="Eye 1", y = "Object distance (mm)") +
-  #scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-  #scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-  #geom_jitter(shape = 19, size = 2, alpha = 0.7, position = position_jitter(0.1)) + 
-  #theme_classic() +
-  #theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
-        #axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        #axis.text = element_text(size = 20, face = "bold"),
-                                 #legend.position = "none")
-
-#E1_oph
-
-# Not using these as the analyses don't combine left and right eyes (that becomes pseudo-replication!)
+# Boxplot of log fold gene expression
+qPCR_plot <- qpcr_data %>%
+  ggplot(aes(y= log_fold_gene_expression, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  labs(title=NULL,x = NULL, y = "Log fold gene expression") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_signif(comparisons=list(c("control", "lens3_249")), annotations="*", # adds a significance star
+              map_signif_level = TRUE, textsize = 10, 
+              vjust = 0.5,
+              margin_top = 0.1) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+                                 legend.position = "none")
+qPCR_plot
 ```
 
-# Figures
+```{r qPCR figure}
+
+pdf(file = "Figures/qPCR.pdf", width = 9,  height = 6)
+qPCR_plot
+dev.off()
+
+```
+
+## Relative Edge Sharpness 
+
+Comparing the relative edge sharpness curves across groups using LOESS, which is a locally weighted scatterplot smoother. The method fits a smooth line through data by fitting weighted least squares (WLS) models to observations within a user-specified window of the focal point, whose width (span) is typically expressed as a proportion α of the n data points. The ribbon is representative of standard error.  
+
+```{r relative edge sharpness regression plots}
+
+# Creating new column with the eye and probe identity
+edge_data <- edge_data %>%
+  mutate(eye_probe = paste(eye, probe, sep="_"))
+
+# Trimming dataset to 550 µm for consistency
+edge_data <- edge_data %>%
+  filter(distance <= 600)
+
+# Individual eye plots
+
+# LE1
+LE1_edge_plot <- edge_data %>%
+  filter(eye == "LE1") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
+  #geom_point() +
+  stat_smooth(span = 0.1, se = TRUE,
+              method = 'loess',
+              formula = 'y ~ x',
+              aes(fill = eye_probe, colour = eye_probe)) +
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_x_continuous("Distance from back surface of lens (µm)", 
+                     breaks = c(250, 350, 450, 550), 
+                     limits = c(185, 600)) +
+  scale_y_continuous("Relative edge sharpness",
+                     breaks = c(1, 1.5, 2.5, 3.5)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 15))
+LE1_edge_plot 
+
+# LE2
+LE2_edge_plot <- edge_data %>%
+  filter(eye == "LE2") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
+  #geom_point() +
+  stat_smooth(span = 0.1, se = TRUE,
+              method = 'loess',
+              formula = 'y ~ x',
+              aes(fill = eye_probe, colour = eye_probe))+
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_x_continuous("Distance from back surface of lens (µm)", 
+                     breaks = c(250, 350, 450, 550), 
+                     limits = c(185, 600)) +
+  scale_y_continuous("Relative edge sharpness",
+                     breaks = c(1, 2, 3, 4)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 25, face = "bold"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 15))
+LE2_edge_plot 
+
+# RE1
+RE1_edge_plot <- edge_data %>%
+  filter(eye == "RE1") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
+  #geom_point() +
+  stat_smooth(span = 0.1, se = TRUE, 
+              method = 'loess',
+              formula = 'y ~ x',
+              aes(fill = eye_probe, colour = eye_probe)) +
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_x_continuous("Distance from back surface of lens (µm)", 
+                     breaks = c(250, 350, 450, 550), 
+                     limits = c(185, 600)) +
+  scale_y_continuous("Relative edge sharpness",
+                     breaks = c(1, 1.5, 2.5, 3.5)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 15))
+RE1_edge_plot 
+
+# RE2
+RE2_edge_plot <- edge_data %>%
+  filter(eye == "RE2") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye_probe, colour = eye_probe)) +
+  #geom_point() +
+  stat_smooth(span = 0.1, se = TRUE,
+              method = 'loess',
+              formula = 'y ~ x',
+              aes(fill = eye_probe, colour = eye_probe)) + 
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_continuous("Distance from back surface of lens (µm)", 
+                     breaks = c(250, 350, 450, 550), 
+                     limits = c(185, 600)) +
+  scale_y_continuous("Relative edge sharpness",
+                     breaks = c(1, 2, 3, 4)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 20, face = "bold"),
+        legend.position = "none")
+RE2_edge_plot 
+
+# Plot for a single individual
+individual_edge_plot <- edge_data %>%
+  filter(individual == "249_18") %>%
+  ggplot(aes(y= contrast, x = distance, group = eye)) +
+  geom_point(aes(fill = eye_probe, colour = eye_probe)) +
+  scale_colour_manual(values = c("#56B4E9", "#E69F00", "#0072B2", "#D55E00")) +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#0072B2", "#D55E00")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_x_continuous("Distance from back surface of lens (µm)") +
+  scale_y_continuous("Relative edge sharpness") +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 15, face = "bold", vjust = -1.2),
+        axis.title.y = element_text(size = 15, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 15, face = "bold"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 15))
+individual_edge_plot 
+
+# Unused but useful bit of code:
+# Melting the data by distance to make it long format:
+# edge_data <- melt(edge_data, id.vars = "distance", value.name = "contrast")
+
+# Pulling information from rows and trying to organise it into a new column:
+# edge_data_long$left <- str_detect(edge_data_long$variable, "L") 
+```
+
+```{r LE2 edge sharpness regression figure}
+
+pdf(file = "Figures/LE2_edge_sharpness.pdf", width = 9,  height = 6)
+LE2_edge_plot
+dev.off()
+
+```
+
+```{r supplementary edge sharpness regressions}
+
+fig.a <- LE1_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.a
+
+fig.b <- RE1_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.b
+
+fig.c <- LE2_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.text = element_text(size = 20, face = "bold"),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.c
+
+fig.d <- RE2_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.d
+
+# Creating common axis labels
+y.grob <- textGrob("Relative edge sharpness", 
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25), rot = 90)
+
+x.grob <- textGrob("Distance from back surface of lens (µm)",
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25))
+
+# Use cowplot package to nicely plot the graphs together with a shared common legend.
+edge_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
+                   #list of plots to arrange in grid
+                   rel_widths = c(6, 6),
+                   align = "v",
+                   nrow = 2)
+
+plot_grid(edge_supplement_plot)
+
+# Print graph
+cairo_pdf(file = "Figures/edge_regression_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
+grid.arrange(arrangeGrob(edge_supplement_plot, left = y.grob,
+                         bottom = x.grob))
+dev.off()
+```
+
+Comparing maximum edge sharpness values between controls and tests. This usually corresponds to the second peak/image. However, sometimes the first peak has higher edge sharpness in the knockdowns; That's some of the eyes of some individuals (3/10) for Probe 1 and for Probe 2 (4/10). In some eyes of Probe 2 individuals (2/10), best focused images could not be detected in the edge sharpness plots or manually
+
+```{r maximum edge sharpness boxplots}
+
+# LE1
+LE1_max_edge <- focal_data %>%
+  filter(eye == "LE1") %>%
+  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_y_continuous(limits = c(0, 8.2), breaks = c(1, 3, 5, 7)) +
+  labs(title=NULL,x="Left eye 1", y = "Maximum edge sharpness") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_signif(comparisons=list(c("control", "lens3_249")), annotations="*", # adds a significance star
+              map_signif_level = TRUE, textsize = 10, 
+              vjust = 0.5,
+              margin_top = 0.1) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 18, face = "bold"),
+                                 legend.position = "none")
+LE1_max_edge
+
+# LE2
+LE2_max_edge <- focal_data %>%
+  filter(eye == "LE2") %>%
+  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_y_continuous(limits = c(0, 8.75), breaks = c(2, 4, 6, 8)) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  labs(title=NULL,x="Left eye 2", y = "Maximum edge sharpness") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) +
+  geom_signif(comparisons=list(c("control", "lens3_249")), annotations="*", # adds a significance star
+              map_signif_level = TRUE, textsize = 10, 
+              vjust = 0.5,
+              margin_top = 0.1) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 18, face = "bold"),
+                                 legend.position = "none")
+LE2_max_edge
+
+# RE1
+RE1_max_edge <- focal_data %>%
+  filter(eye == "RE1") %>%
+  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_y_continuous(limits = c(0, 8.2), breaks = c(1, 3, 5, 7)) +
+  labs(title=NULL,x="Right eye 1", y = "Maximum edge sharpness") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) +
+  geom_signif(comparisons=list(c("control", "lens3_249")), annotations="*", # adds a significance star
+              map_signif_level = TRUE, textsize = 10, 
+              vjust = 0.5,
+              margin_top = 0.1) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 18, face = "bold"),
+                                 legend.position = "none")
+RE1_max_edge
+
+# RE2
+RE2_max_edge <- focal_data %>%
+  filter(eye == "RE2") %>%
+  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_y_continuous(limits = c(0, 8.75), breaks = c(2, 4, 6, 8)) +
+  labs(title=NULL,x="Right eye 2", y = "Maximum edge sharpness") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  geom_signif(comparisons=list(c("control", "lens3_249")), annotations="*", # adds a significance star
+              map_signif_level = TRUE, textsize = 10, 
+              vjust = 0.5,
+              margin_top = 0.1) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 18, face = "bold"),
+                                 legend.position = "none")
+RE2_max_edge
+
+# scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+# scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+```
+
+```{r supplementary maximum edge sharpness figure}
+
+fig.a <- LE1_max_edge +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.a
+
+fig.b <- RE1_max_edge +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.b
+
+fig.c <- LE2_max_edge +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.c
+
+fig.d <- RE2_max_edge +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.d
+
+# Creating common axis labels
+y.grob <- textGrob("Maximum relative edge sharpness", 
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25), rot = 90)
+
+# Use cowplot package to nicely plot the graphs together with a shared common legend.
+max_sharpness_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
+                   #list of plots to arrange in grid
+                   rel_widths = c(6, 6),
+                   align = "v",
+                   nrow = 2)
+
+plot_grid(max_sharpness_plot)
+
+# Print graph
+cairo_pdf(file = "Figures/max_sharpness_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
+grid.arrange(arrangeGrob(max_sharpness_plot, left = y.grob))
+dev.off()
+```
+
+## Back focal length
+Only using the 2nd (typically taller) peak for this because the 1st is often hard to detect. Went through the image series side-by-side to verify these. 
+```{r back focal length boxplots}
+
+# LE1
+LE1_focal <- focal_data %>%
+  filter(eye == "LE1") %>%
+  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_y_continuous(limits = c(250, 500), 
+                     breaks = c(300, 350, 400, 450, 500)) +
+  labs(title=NULL,x="Left eye 1", y = "Back focal length (µm)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 18, face = "bold"),
+                                 legend.position = "none")
+LE1_focal
+
+# LE2
+LE2_focal <- focal_data %>%
+  filter(eye == "LE2") %>%
+  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_y_continuous(limits = c(250, 500), 
+                     breaks = c(300, 350, 400, 450, 500)) +
+  labs(title=NULL,x="Left eye 2", y = "Back focal length (µm)") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 22, face = "bold"),
+                                 legend.position = "none")
+LE2_focal
+
+# RE1
+RE1_focal <- focal_data %>%
+  filter(eye == "RE1") %>%
+  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_y_continuous(limits = c(250, 500), 
+                     breaks = c(300, 350, 400, 450, 500)) +
+  labs(title=NULL,x="Right eye 1", y = "Back focal length") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 18, face = "bold"),
+                                 legend.position = "none")
+RE1_focal
+
+# RE2
+RE2_focal <- focal_data %>%
+  filter(eye == "RE2") %>%
+  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
+  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_y_continuous(limits = c(250, 500), 
+                     breaks = c(300, 350, 400, 450, 500)) +
+  labs(title=NULL,x="Right eye 2", y = "Back focal length") +
+  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
+        axis.text = element_text(size = 18, face = "bold"),
+                                 legend.position = "none")
+RE2_focal
+
+# scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
+# scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
+```
+
+```{r LE2 back focal length figure}
+
+pdf(file = "Figures/LE2_back_focal.pdf", width = 8.8,  height = 8)
+LE2_focal
+dev.off()
+
+```
+
+```{r supplementary back focal length figure}
+
+fig.a <- LE1_focal +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.a
+
+fig.b <- RE1_focal +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.b
+
+fig.c <- LE2_focal +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        axis.title.x = element_text(size = 25, face = "bold"),
+        axis.text = element_text(size = 18, face = "bold"))
+  
+fig.c
+
+fig.d <- RE2_focal +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none")
+  
+fig.d
+
+# Creating common axis labels
+y.grob <- textGrob("Back focal length (µm)", 
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25), rot = 90)
+
+# Use cowplot package to nicely plot the graphs together with a shared common legend.
+focal_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
+                   #list of plots to arrange in grid
+                   rel_widths = c(6, 6),
+                   nrow = 2)
+
+plot_grid(focal_supplement_plot)
+
+# Print graph
+cairo_pdf(file = "Figures/focal_supplement_plot.pdf", width = 13,  height = 8) # cairo_pdf is able to handle special characters
+grid.arrange(arrangeGrob(focal_supplement_plot, left = y.grob))
+dev.off()
+```
 
 ## Ophthalmoscope
 
@@ -386,463 +806,6 @@ y.grob <- textGrob("Object distance (mm)",
 # Print graph
 cairo_pdf(file = "Figures/ophthalmoscope_long.pdf", width = 12,  height = 9) # cairo_pdf is able to handle special characters
 grid.arrange(arrangeGrob(long_plot, left = y.grob)) #adding common y axis label to plot
-dev.off()
-```
-
-## Relative Edge Sharpness 
-
-Comparing the relative edge sharpness curves across groups using LOESS, which is a locally weighted scatterplot smoother. The method fits a smooth line through data by fitting weighted least squares (WLS) models to observations within a user-specified window of the focal point, whose width (span) is typically expressed as a proportion α of the n data points. The ribbon is representative of standard error.  
-
-```{r relative edge sharpness regression plots}
-
-# Creating new column with the eye and probe identity
-edge_data <- edge_data %>%
-  mutate(eye_probe = paste(eye, probe, sep="_"))
-
-# Trimming dataset to 550 µm for consistency
-edge_data <- edge_data %>%
-  filter(distance <= 600)
-
-# Individual eye plots
-
-# LE1
-LE1_edge_plot <- edge_data %>%
-  filter(eye == "LE1") %>%
-  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
-  #geom_point() +
-  stat_smooth(span = 0.1, se = TRUE,
-              method = 'loess',
-              formula = 'y ~ x',
-              aes(fill = eye_probe, colour = eye_probe)) +
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from back surface of lens (µm)", 
-                     breaks = c(250, 350, 450, 550), 
-                     limits = c(185, 600)) +
-  scale_y_continuous("Relative edge sharpness",
-                     breaks = c(1, 1.5, 2.5, 3.5)) +
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 15))
-LE1_edge_plot 
-
-# LE2
-LE2_edge_plot <- edge_data %>%
-  filter(eye == "LE2") %>%
-  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
-  #geom_point() +
-  stat_smooth(span = 0.1, se = TRUE,
-              method = 'loess',
-              formula = 'y ~ x',
-              aes(fill = eye_probe, colour = eye_probe))+
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from back surface of lens (µm)", 
-                     breaks = c(250, 350, 450, 550), 
-                     limits = c(185, 600)) +
-  scale_y_continuous("Relative edge sharpness",
-                     breaks = c(1, 2, 3, 4)) +
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 25, face = "bold"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 15))
-LE2_edge_plot 
-
-# RE1
-RE1_edge_plot <- edge_data %>%
-  filter(eye == "RE1") %>%
-  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
-  #geom_point() +
-  stat_smooth(span = 0.1, se = TRUE, 
-              method = 'loess',
-              formula = 'y ~ x',
-              aes(fill = eye_probe, colour = eye_probe)) +
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from back surface of lens (µm)", 
-                     breaks = c(250, 350, 450, 550), 
-                     limits = c(185, 600)) +
-  scale_y_continuous("Relative edge sharpness",
-                     breaks = c(1, 1.5, 2.5, 3.5)) +
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 15))
-RE1_edge_plot 
-
-# RE2
-RE2_edge_plot <- edge_data %>%
-  filter(eye == "RE2") %>%
-  ggplot(aes(y= contrast, x = distance, group = eye_probe, colour = eye_probe)) +
-  #geom_point() +
-  stat_smooth(span = 0.1, se = TRUE,
-              method = 'loess',
-              formula = 'y ~ x',
-              aes(fill = eye_probe, colour = eye_probe)) + 
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_continuous("Distance from back surface of lens (µm)", 
-                     breaks = c(250, 350, 450, 550), 
-                     limits = c(185, 600)) +
-  scale_y_continuous("Relative edge sharpness",
-                     breaks = c(1, 2, 3, 4)) +
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-        legend.position = "none")
-RE2_edge_plot 
-
-# Plot for a single individual
-individual_edge_plot <- edge_data %>%
-  filter(individual == "249_18") %>%
-  ggplot(aes(y= contrast, x = distance, group = eye)) +
-  geom_point(aes(fill = eye_probe, colour = eye_probe)) +
-  scale_colour_manual(values = c("#56B4E9", "#E69F00", "#0072B2", "#D55E00")) +
-  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#0072B2", "#D55E00")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
-  scale_x_continuous("Distance from back surface of lens (µm)") +
-  scale_y_continuous("Relative edge sharpness") +
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 15, face = "bold", vjust = -1.2),
-        axis.title.y = element_text(size = 15, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 15, face = "bold"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 15))
-individual_edge_plot 
-
-# Unused but useful bit of code:
-# Melting the data by distance to make it long format:
-# edge_data <- melt(edge_data, id.vars = "distance", value.name = "contrast")
-
-# Pulling information from rows and trying to organise it into a new column:
-# edge_data_long$left <- str_detect(edge_data_long$variable, "L") 
-```
-
-```{r LE2 edge sharpness regression figure}
-
-pdf(file = "Figures/LE2_edge_sharpness.pdf", width = 9,  height = 6)
-LE2_edge_plot
-dev.off()
-
-```
-
-```{r supplementary edge sharpness regressions}
-
-fig.a <- LE1_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.a
-
-fig.b <- RE1_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.b
-
-fig.c <- LE2_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.text = element_text(size = 20, face = "bold"),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.c
-
-fig.d <- RE2_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.d
-
-# Creating common axis labels
-y.grob <- textGrob("Relative edge sharpness", 
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90)
-
-x.grob <- textGrob("Distance from back surface of lens (µm)",
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25))
-
-# Use cowplot package to nicely plot the graphs together with a shared common legend.
-edge_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
-                   #list of plots to arrange in grid
-                   rel_widths = c(6, 6),
-                   align = "v",
-                   nrow = 2)
-
-plot_grid(edge_supplement_plot)
-
-# Print graph
-cairo_pdf(file = "Figures/edge_regression_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
-grid.arrange(arrangeGrob(edge_supplement_plot, left = y.grob,
-                         bottom = x.grob))
-dev.off()
-```
-
-Comparing maximum edge sharpness values between controls and tests. This usually corresponds to the second peak/image. However, sometimes the first peak has higher edge sharpness in the knockdowns; That's some of the eyes of some individuals (3/10) for Probe 1 and for Probe 2 (4/10). In some eyes of Probe 2 individuals (2/10), best focused images could not be detected in the edge sharpness plots or manually
-
-```{r maximum edge sharpness boxplots}
-
-# LE1
-LE1_max_edge <- focal_data %>%
-  filter(eye == "LE1") %>%
-  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  scale_y_continuous(limits = c(0, 7.5), breaks = c(1, 3, 5, 7)) +
-  labs(title=NULL,x="Left eye 1", y = "Maximum edge sharpness") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-LE1_max_edge
-
-# LE2
-LE2_max_edge <- focal_data %>%
-  filter(eye == "LE2") %>%
-  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_y_continuous(limits = c(0, 8), breaks = c(2, 4, 6, 8)) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  labs(title=NULL,x="Left eye 2", y = "Maximum edge sharpness") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-LE2_max_edge
-
-# RE1
-RE1_max_edge <- focal_data %>%
-  filter(eye == "RE1") %>%
-  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  scale_y_continuous(limits = c(0, 7.5), breaks = c(1, 3, 5, 7)) +
-  labs(title=NULL,x="Right eye 1", y = "Maximum edge sharpness") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-RE1_max_edge
-
-# RE2
-RE2_max_edge <- focal_data %>%
-  filter(eye == "RE2") %>%
-  ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  scale_y_continuous(limits = c(0, 8), breaks = c(2, 4, 6, 8)) +
-  labs(title=NULL,x="Right eye 2", y = "Maximum edge sharpness") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
-                                 legend.position = "none")
-RE2_max_edge
-
-# scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-# scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-```
-
-```{r supplementary maximum edge sharpness figure}
-
-fig.a <- LE1_max_edge +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.a
-
-fig.b <- RE1_max_edge +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.b
-
-fig.c <- LE2_max_edge +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.c
-
-fig.d <- RE2_max_edge +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.d
-
-# Creating common axis labels
-y.grob <- textGrob("Maximum relative edge sharpness", 
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90)
-
-# Use cowplot package to nicely plot the graphs together with a shared common legend.
-max_sharpness_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
-                   #list of plots to arrange in grid
-                   rel_widths = c(6, 6),
-                   align = "v",
-                   nrow = 2)
-
-plot_grid(max_sharpness_plot)
-
-# Print graph
-cairo_pdf(file = "Figures/max_sharpness_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
-grid.arrange(arrangeGrob(max_sharpness_plot, left = y.grob))
-dev.off()
-```
-
-## Back focal length
-Only using the 2nd (typically taller) peak for this because the 1st is often hard to detect. Went through the image series side-by-side to verify these. 
-```{r back focal length boxplots}
-
-# LE1
-LE1_focal <- focal_data %>%
-  filter(eye == "LE1") %>%
-  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  scale_y_continuous(limits = c(250, 500), 
-                     breaks = c(300, 350, 400, 450, 500)) +
-  labs(title=NULL,x="Left eye 1", y = "Back focal length (µm)") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
-                                 legend.position = "none")
-LE1_focal
-
-# LE2
-LE2_focal <- focal_data %>%
-  filter(eye == "LE2") %>%
-  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  scale_y_continuous(limits = c(250, 500), 
-                     breaks = c(300, 350, 400, 450, 500)) +
-  labs(title=NULL,x="Left eye 2", y = "Back focal length (µm)") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 22, face = "bold"),
-                                 legend.position = "none")
-LE2_focal
-
-# RE1
-RE1_focal <- focal_data %>%
-  filter(eye == "RE1") %>%
-  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  scale_y_continuous(limits = c(250, 500), 
-                     breaks = c(300, 350, 400, 450, 500)) +
-  labs(title=NULL,x="Right eye 1", y = "Back focal length") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
-                                 legend.position = "none")
-RE1_focal
-
-# RE2
-RE2_focal <- focal_data %>%
-  filter(eye == "RE2") %>%
-  ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
-  scale_y_continuous(limits = c(250, 500), 
-                     breaks = c(300, 350, 400, 450, 500)) +
-  labs(title=NULL,x="Right eye 2", y = "Back focal length") +
-  geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
-                                 legend.position = "none")
-RE2_focal
-
-# scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-# scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-```
-
-```{r LE2 back focal length figure}
-
-pdf(file = "Figures/LE2_back_focal.pdf", width = 8.8,  height = 8)
-LE2_focal
-dev.off()
-
-```
-
-```{r supplementary back focal length figure}
-
-fig.a <- LE1_focal +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.a
-
-fig.b <- RE1_focal +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.b
-
-fig.c <- LE2_focal +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        axis.title.x = element_text(size = 25, face = "bold"),
-        axis.text = element_text(size = 18, face = "bold"))
-  
-fig.c
-
-fig.d <- RE2_focal +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
-  
-fig.d
-
-# Creating common axis labels
-y.grob <- textGrob("Back focal length (µm)", 
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90)
-
-# Use cowplot package to nicely plot the graphs together with a shared common legend.
-focal_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
-                   #list of plots to arrange in grid
-                   rel_widths = c(6, 6),
-                   nrow = 2)
-
-plot_grid(focal_supplement_plot)
-
-# Print graph
-cairo_pdf(file = "Figures/focal_supplement_plot.pdf", width = 13,  height = 8) # cairo_pdf is able to handle special characters
-grid.arrange(arrangeGrob(focal_supplement_plot, left = y.grob))
 dev.off()
 ```
 
@@ -1536,38 +1499,27 @@ dev.off()
 
 # Statistics
 
-## Ophthalmoscope
-```{r ophthalmoscope stats}
+## qPCR
+```{r qPCR stats}
 
 ## Test for normality
 
 # Building the linear model
-oph_model <- lm(bestimagereciprocal ~ probe, data = oph_data)
+qPCR_model <- lm(log_fold_gene_expression ~ probe, data = qpcr_data)
 
 # Creating a QQ plot of residuals
-ggqqplot(residuals(oph_model))
+ggqqplot(residuals(qPCR_model))
 
 # Test for normality
-shapiro_test(residuals(oph_model))
-# p < 0.05 so can't assume normality
+shapiro_test(residuals(qPCR_model))
+# p > 0.05 so assuming normality
 
-# Checking normality assumption by groups
-oph_data %>%
-  group_by(probe) %>%
-  shapiro_test(bestimagereciprocal)
-# again p < 0.05 so can't assume normality
+# Using an ANOVA test
+res_qPCR_aov <- compare_means(log_fold_gene_expression ~ probe, data = qpcr_data, method = 'anova')
+res_qPCR_aov
 
-# Creating QQ plots for each group level
-ggqqplot(oph_data, "bestimagereciprocal", facet.by = "probe")
-# Probe 2 (lens3_249) is the only one that looks normal. Other two are kinda wonky
-
-# Using a Kruskal-Wallis test
-res_oph_kw <- compare_means(bestimagereciprocal ~ probe, data = oph_data, 
-              group.by = "eye", method = 'kruskal.test')
-res_oph_kw
-
-summary(res_oph_kw)
-# No significant changes in focused state with lens3 knockdown - all eyes
+summary(res_qPCR_aov)
+# Significant reduction in log fold lens3 expression for both probes compared to controls
 
 ```
 
@@ -1638,6 +1590,41 @@ res_focal_aov
 
 summary(res_focal_aov)
 # No significant changes in back focal length with lens3 knockdown - all eyes
+
+```
+
+## Ophthalmoscope
+```{r ophthalmoscope stats}
+
+## Test for normality
+
+# Building the linear model
+oph_model <- lm(bestimagereciprocal ~ probe, data = oph_data)
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(oph_model))
+
+# Test for normality
+shapiro_test(residuals(oph_model))
+# p < 0.05 so can't assume normality
+
+# Checking normality assumption by groups
+oph_data %>%
+  group_by(probe) %>%
+  shapiro_test(bestimagereciprocal)
+# again p < 0.05 so can't assume normality
+
+# Creating QQ plots for each group level
+ggqqplot(oph_data, "bestimagereciprocal", facet.by = "probe")
+# Probe 2 (lens3_249) is the only one that looks normal. Other two are kinda wonky
+
+# Using a Kruskal-Wallis test
+res_oph_kw <- compare_means(bestimagereciprocal ~ probe, data = oph_data, 
+              group.by = "eye", method = 'kruskal.test')
+res_oph_kw
+
+summary(res_oph_kw)
+# No significant changes in focused state with lens3 knockdown - all eyes
 
 ```
 
