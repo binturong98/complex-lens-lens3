@@ -66,6 +66,7 @@ palette.colors(palette = "Okabe-Ito")
 ```
 
 # Figures
+For the code below to work, create a folder called "Figures" in the same place as the RProject and RMarkdown file
 
 ## qPCR
 
@@ -106,7 +107,7 @@ dev.off()
 
 Comparing the relative edge sharpness curves across groups using LOESS, which is a locally weighted scatterplot smoother. The method fits a smooth line through data by fitting weighted least squares (WLS) models to observations within a user-specified window of the focal point, whose width (span) is typically expressed as a proportion α of the n data points. The ribbon is representative of standard error.  
 
-```{r relative edge sharpness regression plots}
+```{r relative edge sharpness curves}
 
 # Creating new column with the eye and probe identity
 edge_data <- edge_data %>%
@@ -193,24 +194,25 @@ RE1_edge_plot
 # RE2
 RE2_edge_plot <- edge_data %>%
   filter(eye == "RE2") %>%
-  ggplot(aes(y= contrast, x = distance, group = eye_probe, colour = eye_probe)) +
+  ggplot(aes(y= contrast, x = distance, group = eye_probe)) +
   #geom_point() +
-  stat_smooth(span = 0.1, se = TRUE,
+  stat_smooth(span = 0.1, se = TRUE, 
               method = 'loess',
               formula = 'y ~ x',
-              aes(fill = eye_probe, colour = eye_probe)) + 
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00")) +
+              aes(fill = eye_probe, colour = eye_probe)) +
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
   scale_x_continuous("Distance from back surface of lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
   scale_y_continuous("Relative edge sharpness",
-                     breaks = c(1, 2, 3, 4)) +
+                     breaks = c(1, 1.5, 2.5, 3.5)) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
         axis.text = element_text(size = 20, face = "bold"),
-        legend.position = "none")
+        legend.title = element_blank(),
+        legend.text = element_text(size = 15))
 RE2_edge_plot 
 
 # Plot for a single individual
@@ -246,19 +248,33 @@ dev.off()
 
 ```
 
-```{r supplementary edge sharpness regressions}
+```{r supplementary edge sharpness curves}
 
 fig.a <- LE1_edge_plot +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 1, 0.5), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+# adding a second x axis label
+fig.a <- ggdraw(fig.a) + 
+  draw_label("Left eye 1",
+             size = 20, fontface = "bold",
+             y = 0.05) # y coordinates
   
 fig.a
 
 fig.b <- RE1_edge_plot +
-  theme(axis.title.x = element_blank(),
+ theme(axis.title.x = element_blank(),
         axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 1, 0), "cm"))
+
+# adding a second x axis label
+fig.b <- ggdraw(fig.b) + 
+  draw_label("Right eye 1",
+             size = 20, fontface = "bold",
+             y = 0.05) # y coordinates
   
 fig.b
 
@@ -266,27 +282,45 @@ fig.c <- LE2_edge_plot +
   theme(axis.title.x = element_blank(),
         axis.text = element_text(size = 20, face = "bold"),
         axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 1, 0.5), "cm"))
   
+# adding a second x axis label
+fig.c <- ggdraw(fig.c) + 
+  draw_label("Left eye 2",
+             size = 20, fontface = "bold",
+             y = 0.05) # y coordinates
+
 fig.c
 
 fig.d <- RE2_edge_plot +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 1, 0), "cm"))
   
+# adding a second x axis label
+fig.d <- ggdraw(fig.d) + 
+  draw_label("Right eye 2",
+             size = 20, fontface = "bold",
+             y = 0.05) # y coordinates
+
 fig.d
 
 # Creating common axis labels
 y.grob <- textGrob("Relative edge sharpness", 
                    gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90)
+                             fontsize = 25), rot = 90, vjust = 0.5)
 
 x.grob <- textGrob("Distance from back surface of lens (µm)",
                    gp = gpar(fontface = "bold",
                              fontsize = 25))
 
-# Use cowplot package to nicely plot the graphs together with a shared common legend.
+# extract legend from one figure
+legend <- get_legend(LE1_edge_plot + 
+                       theme(legend.position = "bottom")) # legend is laid out horizontally
+
+# Use cowplot package to nicely plot the graphs together
 edge_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
                    #list of plots to arrange in grid
                    rel_widths = c(6, 6),
@@ -295,10 +329,15 @@ edge_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
 
 plot_grid(edge_supplement_plot)
 
+edge_supplement_leg <- plot_grid(edge_supplement_plot, x.grob,
+                                 ncol = 1, rel_heights = c(1, .1))
+plot_grid(edge_supplement_leg)
+
 # Print graph
-cairo_pdf(file = "Figures/edge_regression_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
-grid.arrange(arrangeGrob(edge_supplement_plot, left = y.grob,
-                         bottom = x.grob))
+cairo_pdf(file = "Figures/edge_curve_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
+grid.arrange(arrangeGrob(edge_supplement_leg, 
+                         left = y.grob,
+                         bottom = legend))
 dev.off()
 ```
 
@@ -398,34 +437,38 @@ RE2_max_edge
 
 fig.a <- LE1_max_edge +
   theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 0.5, 0.5), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
   
 fig.a
 
 fig.b <- RE1_max_edge +
   theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 0.5, 0), "cm"))
   
 fig.b
 
 fig.c <- LE2_max_edge +
   theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 0.5, 0.5), "cm"))
   
 fig.c
 
 fig.d <- RE2_max_edge +
   theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 0.5, 0), "cm"))
   
 fig.d
 
 # Creating common axis labels
 y.grob <- textGrob("Maximum relative edge sharpness", 
                    gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90)
+                             fontsize = 25), rot = 90, vjust = 0.5)
 
-# Use cowplot package to nicely plot the graphs together with a shared common legend.
+# Use cowplot package to nicely plot the graphs together 
 max_sharpness_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
                    #list of plots to arrange in grid
                    rel_widths = c(6, 6),
@@ -532,19 +575,22 @@ dev.off()
 
 fig.a <- LE1_focal +
   theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 0.5, 0.5), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
   
 fig.a
 
 fig.b <- RE1_focal +
   theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 0.5, 0), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
   
 fig.b
 
 fig.c <- LE2_focal +
   theme(axis.title.y = element_blank()) + 
   theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 0.5, 0.5), "cm"),
         axis.title.x = element_text(size = 25, face = "bold"),
         axis.text = element_text(size = 18, face = "bold"))
   
@@ -552,16 +598,17 @@ fig.c
 
 fig.d <- RE2_focal +
   theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none")
+   theme(legend.position = "none",
+        plot.margin = unit(c(0, 0, 0.5, 0), "cm"))
   
 fig.d
 
 # Creating common axis labels
 y.grob <- textGrob("Back focal length (µm)", 
                    gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90)
+                             fontsize = 25), rot = 90, vjust = 0.5)
 
-# Use cowplot package to nicely plot the graphs together with a shared common legend.
+# Use cowplot package to nicely plot the graphs together 
 focal_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
                    #list of plots to arrange in grid
                    rel_widths = c(6, 6),
@@ -762,7 +809,7 @@ theme(legend.position = "none") +
 
 fig.b
 
-# Use cowplot package to nicely plot the graphs together with a shared common legend.
+# Use cowplot package to nicely plot the graphs together
 wide_plot <- plot_grid(fig.a, NULL, fig.b, 
                    #list of plots to arrange in grid
                    rel_widths = c(6, 0.2, 6),
@@ -1423,7 +1470,7 @@ fig.d <- dark_latency_vertical_pooled +
 
 fig.d
 
-# use cowplot package to nicely plot the graphs together with a shared common legend.
+# use cowplot package to nicely plot the graphs together 
 latency_plot <- plot_grid(fig.a, fig.c, fig.b, fig.d, 
                    #list of plots to arrange in grid
                    rel_widths = c(6, 6, 6, 6),
@@ -1470,7 +1517,7 @@ fig.h <- dark_hunting_vertical_pooled +
 
 fig.h
 
-# use cowplot package to nicely plot the graphs together with a shared common legend.
+# use cowplot package to nicely plot the graphs together
 hunting_plot <- plot_grid(fig.e, fig.f, fig.g, fig.h, 
                    #list of plots to arrange in grid
                    rel_widths = c(6, 6, 6, 6),
