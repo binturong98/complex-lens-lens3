@@ -329,13 +329,13 @@ edge_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
 
 plot_grid(edge_supplement_plot)
 
-edge_supplement_leg <- plot_grid(edge_supplement_plot, x.grob,
+edge_supplement_xlab <- plot_grid(edge_supplement_plot, x.grob,
                                  ncol = 1, rel_heights = c(1, .1))
-plot_grid(edge_supplement_leg)
+plot_grid(edge_supplement_xlab)
 
 # Print graph
 cairo_pdf(file = "Figures/edge_curve_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
-grid.arrange(arrangeGrob(edge_supplement_leg, 
+grid.arrange(arrangeGrob(edge_supplement_xlab, 
                          left = y.grob,
                          bottom = legend))
 dev.off()
@@ -796,6 +796,7 @@ E2_LR_oph
 ```
 
 ```{r ophthalmoscope figure}
+
 # Make panels 
 fig.a <- E1_LR_oph +
 theme(legend.position = "none")
@@ -854,6 +855,273 @@ y.grob <- textGrob("Object distance (mm)",
 cairo_pdf(file = "Figures/ophthalmoscope_long.pdf", width = 12,  height = 9) # cairo_pdf is able to handle special characters
 grid.arrange(arrangeGrob(long_plot, left = y.grob)) #adding common y axis label to plot
 dev.off()
+```
+
+```{r estimating left-right asymmetry}
+
+# making a dataframe with one row per individual
+
+# subset each eye
+LE1_oph_data <- filter(oph_data, eye == "LE1")
+RE1_oph_data <- filter(oph_data, eye == "RE1")
+LE2_oph_data <- filter(oph_data, eye == "LE2")
+RE2_oph_data <- filter(oph_data, eye == "RE2")
+
+# putting all dataframes into a list
+oph_df_list <- list(LE1_oph_data, RE1_oph_data, LE2_oph_data, RE2_oph_data)
+
+# merging all dataframes in list 
+LR_oph_data <- oph_df_list %>% 
+  reduce(full_join, by = 'individual')
+
+# clean up
+LR_oph_data <- LR_oph_data %>%
+  rename(bestimagereciprocal.LE1 = bestimagereciprocal.x) %>% # renaming columns
+  rename(bestimagereciprocal.RE1 = bestimagereciprocal.y) %>%
+  rename(bestimagereciprocal.LE2 = bestimagereciprocal.x.x) %>%
+  rename(bestimagereciprocal.RE2 = bestimagereciprocal.y.y) %>%
+  rename(group = group.x) %>%
+  rename(probe = probe.x) %>%
+  select( -c(eye.x, eye.x.x, eye.y, eye.y.y, # removing redundant columns
+             group.x.x, group.y, group.y.y,
+             probe.x.x, probe.y, probe.y.y))
+
+# not by any means an elegant way to do this but I couldn't figure anything else out so :P
+
+# linear models of left vs right reciprocal object distance for each probe
+## E1
+LR_E2_control_mod <- lm(bestimagereciprocal.LE2 ~ bestimagereciprocal.RE2, 
+                        data = LR_oph_data,
+                        subset = probe == "control")
+
+LR_E2_191_mod <- lm(bestimagereciprocal.LE2 ~ bestimagereciprocal.RE2, 
+                        data = LR_oph_data,
+                        subset = probe == "lens3_191")
+LR_E2_249_mod <- lm(bestimagereciprocal.LE2 ~ bestimagereciprocal.RE2, 
+                        data = LR_oph_data,
+                        subset = probe == "lens3_249")
+
+# linear models of left vs right reciprocal object distance for each probe
+## E1
+LR_E1_control_mod <- lm(bestimagereciprocal.LE1 ~ bestimagereciprocal.RE1, 
+                        data = LR_oph_data,
+                        subset = probe == "control")
+
+LR_E1_191_mod <- lm(bestimagereciprocal.LE1 ~ bestimagereciprocal.RE1, 
+                        data = LR_oph_data,
+                        subset = probe == "lens3_191")
+LR_E1_249_mod <- lm(bestimagereciprocal.LE1 ~ bestimagereciprocal.RE1, 
+                        data = LR_oph_data,
+                        subset = probe == "lens3_249")
+
+# summary of each model
+## E1
+summary(LR_E1_control_mod)
+# adj r.r = 0.015
+summary(LR_E1_191_mod)
+# adj r.r = 0.008
+summary(LR_E1_249_mod)
+# adj r.r = -0.124
+
+## E2
+summary(LR_E2_control_mod)
+# adj r.r = 0.80 ***
+summary(LR_E2_191_mod)
+# adj r.r = 0.304
+summary(LR_E2_249_mod)
+# adj r.r = -0.101
+
+# visualising model residuals
+qqnorm(LR_E1_control_mod$residuals, pch = 1, frame = FALSE)
+qqline(LR_E1_control_mod$residuals, col = "steelblue", lwd = 2)
+```
+
+```{r left-right asymmetry plots}
+
+# left eye vs right eye for object distance 
+
+# E1
+## control
+E1_LR_control_oph_plot <- LR_oph_data %>%
+  filter(probe == "control") %>%
+  ggplot(aes(y= bestimagereciprocal.LE1, x = bestimagereciprocal.RE1)) +
+  labs(title=NULL, x = "Right eye 1", y = "Left eye 1") +
+  geom_smooth(method = "lm", color = "#009E73", fill = "#009E73") +
+  geom_point(alpha = 0.8) +
+  scale_x_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2, 0.3),
+                     label = c("5", "10", "∞", "10","5", "3.3")) +
+  scale_y_continuous(breaks = c(-0.2, 0, 0.2, 0.4),
+                     label = c("5", "∞", "5", "2.5")) +
+  theme_classic() +
+  annotate(geom="text", x = 0.25, y = 0.5, 
+           label= expression("R"^2*" = 0.015"),
+           size = 7) +
+  theme(axis.title.x = element_text(size = 23, vjust = -0.15),
+        axis.title.y = element_text(size = 23, vjust = 1.8),
+        axis.text = element_text(size = 20))
+
+E1_LR_control_oph_plot
+
+## Probe 1
+E1_LR_191_oph_plot <- LR_oph_data %>%
+  filter(probe == "lens3_191") %>%
+  ggplot(aes(y= bestimagereciprocal.LE1, x = bestimagereciprocal.RE1)) +
+  labs(title=NULL, x="Right eye 1", y = "Left eye 1") +
+  geom_smooth(method = "lm", color = "#E69F00", fill = "#E69F00") +
+  geom_point(alpha = 0.8) +
+  scale_x_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
+                     label = c("5", "10", "∞", "10","5")) +
+  scale_y_continuous(breaks = c(-0.2, 0, 0.2, 0.4),
+                     label = c("5", "∞", "5", "2.5")) +
+  theme_classic() +
+  annotate(geom="text", x = 0.125, y = 0.6, 
+           label= expression("R"^2*" = 0.008"),
+           size = 7) +
+  theme(axis.title.x = element_text(size = 23, vjust = -0.15),
+        axis.title.y = element_text(size = 23, vjust = 1.8),
+        axis.text = element_text(size = 20))
+
+E1_LR_191_oph_plot
+
+## Probe 2
+E1_LR_249_oph_plot <- LR_oph_data %>%
+  filter(probe == "lens3_249") %>%
+  ggplot(aes(y= bestimagereciprocal.LE1, x = bestimagereciprocal.RE1)) +
+  labs(title=NULL, x="Right eye 1", y = "Left eye 1") +
+  geom_smooth(method = "lm", color = "#D55E00", fill = "#D55E00") +
+  geom_point(alpha = 0.8) +
+  theme_classic() +
+  annotate(geom="text", x = 0.185, y = 0.25, 
+           label= expression("R"^2*" = -0.124"),
+           size = 7) +
+  theme(axis.title.x = element_text(size = 23, vjust = -0.15),
+        axis.title.y = element_text(size = 23, vjust = 1.8),
+        axis.text = element_text(size = 20))
+
+E1_LR_249_oph_plot
+
+# E2
+## control
+E2_LR_control_oph_plot <- LR_oph_data %>%
+  filter(probe == "control") %>%
+  ggplot(aes(y= bestimagereciprocal.LE2, x = bestimagereciprocal.RE2)) +
+  labs(title=NULL, x="Right eye 2", y = "Left eye 2") +
+  geom_smooth(method = "lm", color = "#009E73", fill = "#009E73") +
+  geom_point(alpha = 0.8) +
+  scale_x_continuous(breaks = c(-0.1, 0, 0.1, 0.2),
+                     label = c("10", "∞", "10","5")) +
+  scale_y_continuous(breaks = c(-0.2, 0, 0.2, 0.4),
+                     label = c("5", "∞", "5", "2.5")) +
+  theme_classic() +
+  annotate(geom="text", x = 0.22, y = 0.41, 
+           label= expression(bold("R"^2*" = 0.8")),
+           size = 7) +
+  theme(axis.title.x = element_text(size = 23, vjust = -0.15),
+        axis.title.y = element_text(size = 23, vjust = 1.8),
+        axis.text = element_text(size = 20))
+
+E2_LR_control_oph_plot
+
+## Probe 1
+E2_LR_191_oph_plot <- LR_oph_data %>%
+  filter(probe == "lens3_191") %>%
+  ggplot(aes(y= bestimagereciprocal.LE2, x = bestimagereciprocal.RE2)) +
+  labs(title=NULL, x="Right eye 2", y = "Left eye 2") +
+  geom_smooth(method = "lm", color = "#E69F00", fill = "#E69F00") +
+  geom_point(alpha = 0.8) +
+  scale_x_continuous(breaks = c(-0.1, 0, 0.1, 0.2),
+                     label = c("10", "∞", "10","5")) +
+  scale_y_continuous(breaks = c(-0.2, 0, 0.2, 0.4),
+                     label = c("5", "∞", "5", "2.5")) +
+  theme_classic() +
+  annotate(geom="text", x = 0.18, y = 0.4, 
+           label= expression("R"^2*" = 0.304"),
+           size = 7) +
+  theme(axis.title.x = element_text(size = 23, vjust = -0.15),
+        axis.title.y = element_text(size = 23, vjust = 1.8),
+        axis.text = element_text(size = 20))
+
+E2_LR_191_oph_plot
+
+## Probe 2
+E2_LR_249_oph_plot <- LR_oph_data %>%
+  filter(probe == "lens3_249") %>%
+  ggplot(aes(y= bestimagereciprocal.LE2, x = bestimagereciprocal.RE2)) +
+  labs(title=NULL, x="Right eye 2", y = "Left eye 2") +
+  geom_smooth(method = "lm", color = "#D55E00", fill = "#D55E00") +
+  geom_point(alpha = 0.8) +
+  scale_x_continuous(breaks = c(-0.1, -0.05, 0, 0.05),
+                     label = c("10", "20", "∞", "20")) +
+  scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1),
+                     label = c("5", "10", "∞", "10")) +
+  theme_classic() +
+  annotate(geom="text", x = 0.038, y = 0.135, 
+           label= expression("R"^2*" = -0.101"),
+           size = 7) +
+  theme(axis.title.x = element_text(size = 25, vjust = -0.15),
+        axis.title.y = element_text(size = 25, vjust = 1.8),
+        axis.text = element_text(size = 20))
+
+E2_LR_249_oph_plot
+
+```
+
+```{r left right asymmetry supplementary figure}
+
+fig.a <- E1_LR_control_oph_plot  #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+fig.b <- E1_LR_191_oph_plot 
+
+fig.c <- E1_LR_249_oph_plot 
+
+fig.d <- E2_LR_control_oph_plot
+
+fig.e <- E2_LR_191_oph_plot
+
+fig.f <- E2_LR_249_oph_plot
+
+
+        plot.margin = unit(c(0, 0, 0, 0), "cm")
+# Creating common axis labels
+y.grob <- textGrob("Reciprocal object distance", 
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25), rot = 90, vjust = 0.5)
+
+x.grob <- textGrob("Reciprocal object distance",
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25))
+
+# Building the figure
+LR_oph_asymmetry <- plot_grid(fig.a, fig.b, fig.c, fig.d, fig.e, fig.f,
+           align = 'vh', # align horizontally and vertically
+           axis = 'lb',
+           labels = c("A","B","C","D", "E", "F"), # panel labels for figure
+           label_size = 28,
+           hjust = -.1, # adjustment for panel labels
+           nrow = 2) # number of rows in grids
+
+LR_oph_asymmetry
+
+# adding common x axis label
+LR_asymmetry_xlab <- plot_grid(LR_oph_asymmetry, x.grob,
+                                 ncol = 1, rel_heights = c(1, .1))
+plot_grid(LR_asymmetry_xlab)
+
+# extracting legend from another figure and increasing size
+legend_large <- get_legend(LE1_edge_plot + 
+              theme(legend.position = "bottom",
+              legend.key.size = unit(1, 'cm'), #change legend key size
+              legend.key.height = unit(1, 'cm'), #change legend key height
+              legend.key.width = unit(1, 'cm'), #change legend key width
+              legend.text = element_text(size=16))) #change legend text font size) # legend is laid out horizontally
+
+# Print graph
+cairo_pdf(file = "Figures/LvR_asymmetry_supplement.pdf", width = 23,  height = 13) # cairo_pdf is able to handle special characters
+grid.arrange(arrangeGrob(LR_asymmetry_xlab,
+                         left = y.grob,
+                         bottom = legend_large)) # legend extracted from the edge supplement curves 
+dev.off()
+
 ```
 
 ## Behaviour
@@ -947,6 +1215,8 @@ succesful_strikes_vertical <- behaviour_data %>%
         axis.text = element_text(size = 20, face = "bold"),
                                  legend.position = "none")
 succesful_strikes_vertical
+
+
 ```
 
 ### Hunting success
@@ -1127,7 +1397,6 @@ latency_horizontal_pooled <- behaviour_data %>%
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
          axis.text.y = element_text(size = 30, face = "bold"),
-         axis.text.y = element_text(size = 30, face = "bold"),
         axis.text.x = element_text(size = 30),
                                  legend.position = "none")
 latency_horizontal_pooled
@@ -1148,7 +1417,6 @@ latency_vertical_pooled <- behaviour_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-         axis.text.y = element_text(size = 30, face = "bold"),
          axis.text.y = element_text(size = 30, face = "bold"),
         axis.text.x = element_text(size = 30),
                                  legend.position = "none")
@@ -1562,7 +1830,7 @@ shapiro_test(residuals(qPCR_model))
 # p > 0.05 so assuming normality
 
 # Using an ANOVA test
-res_qPCR_aov <- compare_means(log_fold_gene_expression ~ probe, data = qpcr_data, method = 'anova')
+res_qPCR_aov <- anova_test(log_fold_gene_expression ~ probe, data = qpcr_data)
 res_qPCR_aov
 
 summary(res_qPCR_aov)
@@ -1595,12 +1863,13 @@ focal_data %>%
 ggqqplot(focal_data, "maximum_sharpness", facet.by = "probe")
 # Control and Probe 1 look normal. Probe 2 is kinda wonky. But will proceed with Gaussian stats
 
-# Using an ANOVA test
-res_edge_kw <- compare_means(maximum_sharpness ~ probe, data = focal_data, 
-              group.by = "eye", method = 'kruskal.test')
+# Using a Kruskal Wallis test
+res_edge_kw <- focal_data %>%
+  group_by(eye) %>%
+  kruskal_test(maximum_sharpness ~ probe)
+
 res_edge_kw
 
-summary(res_edge_kw)
 # Significant changes in maximum edge sharpness with lens3 knockdown - all eyes
 
 ```
@@ -1635,6 +1904,12 @@ res_focal_aov <- compare_means(peak_2_um ~ probe, data = focal_data,
               group.by = "eye", method = 'anova')
 res_focal_aov
 
+res_focal_aov <- focal_data %>%
+  group_by(eye) %>%
+  anova_test(peak_2_um ~ probe)
+
+res_focal_aov
+
 summary(res_focal_aov)
 # No significant changes in back focal length with lens3 knockdown - all eyes
 
@@ -1666,8 +1941,10 @@ ggqqplot(oph_data, "bestimagereciprocal", facet.by = "probe")
 # Probe 2 (lens3_249) is the only one that looks normal. Other two are kinda wonky
 
 # Using a Kruskal-Wallis test
-res_oph_kw <- compare_means(bestimagereciprocal ~ probe, data = oph_data, 
-              group.by = "eye", method = 'kruskal.test')
+res_oph_kw <- oph_data %>%
+  group_by(eye) %>%
+  kruskal_test(bestimagereciprocal ~ probe)
+
 res_oph_kw
 
 summary(res_oph_kw)
