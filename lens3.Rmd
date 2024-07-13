@@ -71,6 +71,7 @@ For the code below to work, create a folder called "Figures" in the same place a
 ## qPCR
 
 Comparing lens3 expression using qPCR on whole-head cDNA.
+
 ```{r qPCR plot}
 
 # ATM & STR generated data only
@@ -90,12 +91,12 @@ qPCR_plot <- qpcr_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
                                  legend.position = "none")
 qPCR_plot
 ```
 
-```{r qPCR figure}
+```{r figure 2B: qPCR }
 
 pdf(file = "Figures/qPCR.pdf", width = 9,  height = 6)
 qPCR_plot
@@ -138,7 +139,7 @@ LE1_edge_plot <- edge_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
         legend.title = element_blank(),
         legend.text = element_text(size = 15))
 LE1_edge_plot 
@@ -158,13 +159,18 @@ LE2_edge_plot <- edge_data %>%
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
   scale_y_continuous("Relative edge sharpness",
-                     breaks = c(1, 2, 3, 4)) +
+                     breaks = c(1.5, 2.5, 3.5, 4.5)) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 25, face = "bold"),
+        axis.text = element_text(size = 25),
         legend.title = element_blank(),
-        legend.text = element_text(size = 15))
+        legend.text = element_text(size = 18),
+        legend.position = "inside", legend.position.inside = c(0.9, 0.9), # setting legend coordinates to inside the plot
+        legend.key.size = unit(0.7, 'cm'), #change legend key size
+              legend.key.height = unit(0.7, 'cm'), #change legend key height
+              legend.key.width = unit(0.7, 'cm')) #change legend key width
+      
 LE2_edge_plot 
 
 # RE1
@@ -186,7 +192,7 @@ RE1_edge_plot <- edge_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
         legend.title = element_blank(),
         legend.text = element_text(size = 15))
 RE1_edge_plot 
@@ -206,11 +212,11 @@ RE2_edge_plot <- edge_data %>%
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
   scale_y_continuous("Relative edge sharpness",
-                     breaks = c(1, 1.5, 2.5, 3.5)) +
+                     breaks = c(1.5, 2.5, 3.5, 4.5)) +
   theme_classic() +
   theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -1.2),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
         legend.title = element_blank(),
         legend.text = element_text(size = 15))
 RE2_edge_plot 
@@ -240,107 +246,6 @@ individual_edge_plot
 # edge_data_long$left <- str_detect(edge_data_long$variable, "L") 
 ```
 
-```{r LE2 edge sharpness regression figure}
-
-pdf(file = "Figures/LE2_edge_sharpness.pdf", width = 9,  height = 6)
-LE2_edge_plot
-dev.off()
-
-```
-
-```{r supplementary edge sharpness curves}
-
-fig.a <- LE1_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 1, 0.5), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
-
-# adding a second x axis label
-fig.a <- ggdraw(fig.a) + 
-  draw_label("Left eye 1",
-             size = 20, fontface = "bold",
-             y = 0.05) # y coordinates
-  
-fig.a
-
-fig.b <- RE1_edge_plot +
- theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 1, 0), "cm"))
-
-# adding a second x axis label
-fig.b <- ggdraw(fig.b) + 
-  draw_label("Right eye 1",
-             size = 20, fontface = "bold",
-             y = 0.05) # y coordinates
-  
-fig.b
-
-fig.c <- LE2_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.text = element_text(size = 20, face = "bold"),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 1, 0.5), "cm"))
-  
-# adding a second x axis label
-fig.c <- ggdraw(fig.c) + 
-  draw_label("Left eye 2",
-             size = 20, fontface = "bold",
-             y = 0.05) # y coordinates
-
-fig.c
-
-fig.d <- RE2_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 1, 0), "cm"))
-  
-# adding a second x axis label
-fig.d <- ggdraw(fig.d) + 
-  draw_label("Right eye 2",
-             size = 20, fontface = "bold",
-             y = 0.05) # y coordinates
-
-fig.d
-
-# Creating common axis labels
-y.grob <- textGrob("Relative edge sharpness", 
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90, vjust = 0.5)
-
-x.grob <- textGrob("Distance from back surface of lens (µm)",
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25))
-
-# extract legend from one figure
-legend <- get_legend(LE1_edge_plot + 
-                       theme(legend.position = "bottom")) # legend is laid out horizontally
-
-# Use cowplot package to nicely plot the graphs together
-edge_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
-                   #list of plots to arrange in grid
-                   rel_widths = c(6, 6),
-                   align = "v",
-                   nrow = 2)
-
-plot_grid(edge_supplement_plot)
-
-edge_supplement_xlab <- plot_grid(edge_supplement_plot, x.grob,
-                                 ncol = 1, rel_heights = c(1, .1))
-plot_grid(edge_supplement_xlab)
-
-# Print graph
-cairo_pdf(file = "Figures/edge_curve_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
-grid.arrange(arrangeGrob(edge_supplement_xlab, 
-                         left = y.grob,
-                         bottom = legend))
-dev.off()
-```
-
 Comparing maximum edge sharpness values between controls and tests. This usually corresponds to the second peak/image. However, sometimes the first peak has higher edge sharpness in the knockdowns; That's some of the eyes of some individuals (3/10) for Probe 1 and for Probe 2 (4/10). In some eyes of Probe 2 individuals (2/10), best focused images could not be detected in the edge sharpness plots or manually
 
 ```{r maximum edge sharpness boxplots}
@@ -360,9 +265,9 @@ LE1_max_edge <- focal_data %>%
               vjust = 0.5,
               margin_top = 0.1) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
+        axis.text = element_text(size = 17),
                                  legend.position = "none")
 LE1_max_edge
 
@@ -381,9 +286,9 @@ LE2_max_edge <- focal_data %>%
               vjust = 0.5,
               margin_top = 0.1) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
+        axis.text = element_text(size = 19),
                                  legend.position = "none")
 LE2_max_edge
 
@@ -402,9 +307,9 @@ RE1_max_edge <- focal_data %>%
               vjust = 0.5,
               margin_top = 0.1) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
+        axis.text = element_text(size = 17),
                                  legend.position = "none")
 RE1_max_edge
 
@@ -423,9 +328,9 @@ RE2_max_edge <- focal_data %>%
               vjust = 0.5,
               margin_top = 0.1) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
+        axis.text = element_text(size = 17),
                                  legend.position = "none")
 RE2_max_edge
 
@@ -433,47 +338,160 @@ RE2_max_edge
 # scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
 ```
 
-```{r supplementary maximum edge sharpness figure}
+```{r figure S1: edge sharpness curves}
+
+fig.a <- LE1_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+# adding a second x axis label
+fig.a <- ggdraw(fig.a) + 
+  draw_label("Left eye 1",
+             size = 20,
+             y = 0.05, # y coordinates
+             x = 0.55) 
+  
+fig.a
+
+fig.b <- RE1_edge_plot +
+ theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm"))
+
+# adding a second x axis label
+fig.b <- ggdraw(fig.b) + 
+  draw_label("Right eye 1",
+             size = 20,
+             y = 0.05, # y coordinates
+             x = 0.55) 
+  
+fig.b
+
+fig.c <- LE2_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.text = element_text(size = 20),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm"))
+  
+# adding a second x axis label
+fig.c <- ggdraw(fig.c) + 
+  draw_label("Left eye 2",
+             size = 20,
+             y = 0.05, # y coordinates
+             x = 0.55) 
+
+fig.c
+
+fig.d <- RE2_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm"))
+  
+# adding a second x axis label
+fig.d <- ggdraw(fig.d) + 
+  draw_label("Right eye 2",
+             size = 20,
+             y = 0.05, # y coordinates
+             x = 0.55) 
+
+fig.d
+
+# Creating common axis labels
+y.grob <- textGrob("Relative edge sharpness", 
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25), rot = 90,
+                             vjust = 0.8,
+                             hjust = 0.4)
+
+x.grob <- textGrob("Distance from back surface of lens (µm)",
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25))
+
+# extract legend from one figure
+legend <- get_legend(LE1_edge_plot + 
+                       theme(legend.position = "bottom")) # legend is laid out horizontally
+
+# Use cowplot package to nicely plot the graphs together
+edge_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
+                   #list of plots to arrange in grid
+                   rel_widths = c(6, 6),
+                   labels = c("A","B","C","D"), # panel labels for figure
+                   label_size = 23,
+                   hjust = 0.3, # adjustment for panel labels
+                   vjust = 0.9,
+                   align = "v",
+                   nrow = 2) +
+  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+plot_grid(edge_supplement_plot)
+
+edge_supplement_xlab <- plot_grid(edge_supplement_plot, x.grob,
+                                 ncol = 1, rel_heights = c(1, .1))
+plot_grid(edge_supplement_xlab)
+
+# Print graph
+cairo_pdf(file = "Figures/edge_curve_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
+grid.arrange(arrangeGrob(edge_supplement_xlab, 
+                         left = y.grob,
+                         bottom = legend))
+dev.off()
+
+```
+
+```{r figure S2: maximum edge sharpness boxplots}
 
 fig.a <- LE1_max_edge +
   theme(axis.title.y = element_blank()) + 
   theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 0.5, 0.5), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
   
 fig.a
 
 fig.b <- RE1_max_edge +
   theme(axis.title.y = element_blank()) + 
   theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 0.5, 0), "cm"))
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"))
   
 fig.b
 
 fig.c <- LE2_max_edge +
   theme(axis.title.y = element_blank()) + 
   theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 0.5, 0.5), "cm"))
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"),
+        axis.text = element_text(size = 17))
   
 fig.c
 
 fig.d <- RE2_max_edge +
   theme(axis.title.y = element_blank()) + 
   theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 0.5, 0), "cm"))
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"))
   
 fig.d
 
 # Creating common axis labels
 y.grob <- textGrob("Maximum relative edge sharpness", 
                    gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90, vjust = 0.5)
+                             fontsize = 25), rot = 90,
+                             vjust = 0.6,
+                             hjust = 0.5)
 
 # Use cowplot package to nicely plot the graphs together 
 max_sharpness_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
                    #list of plots to arrange in grid
                    rel_widths = c(6, 6),
                    align = "v",
-                   nrow = 2)
+                   labels = c("A","B","C","D"), # panel labels for figure
+                   label_size = 23,
+                   hjust = 0.3, # adjustment for panel labels
+                   vjust = 0.9,
+                   nrow = 2) +
+  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
 
 plot_grid(max_sharpness_plot)
 
@@ -481,10 +499,12 @@ plot_grid(max_sharpness_plot)
 cairo_pdf(file = "Figures/max_sharpness_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
 grid.arrange(arrangeGrob(max_sharpness_plot, left = y.grob))
 dev.off()
+
 ```
 
 ## Back focal length
 Only using the 2nd (typically taller) peak for this because the 1st is often hard to detect. Went through the image series side-by-side to verify these. 
+
 ```{r back focal length boxplots}
 
 # LE1
@@ -499,9 +519,9 @@ LE1_focal <- focal_data %>%
   labs(title=NULL,x="Left eye 1", y = "Back focal length (µm)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
+        axis.text = element_text(size = 17),
                                  legend.position = "none")
 LE1_focal
 
@@ -519,7 +539,7 @@ LE2_focal <- focal_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 22, face = "bold"),
+        axis.text = element_text(size = 19),
                                  legend.position = "none")
 LE2_focal
 
@@ -535,9 +555,9 @@ RE1_focal <- focal_data %>%
   labs(title=NULL,x="Right eye 1", y = "Back focal length") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
+        axis.text = element_text(size = 17),
                                  legend.position = "none")
 RE1_focal
 
@@ -553,9 +573,9 @@ RE2_focal <- focal_data %>%
   labs(title=NULL,x="Right eye 2", y = "Back focal length") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   theme_classic() +
-  theme(axis.title.x = element_text(size = 25, face = "bold", vjust = -0.15),
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
         axis.title.y = element_text(size = 25, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 18, face = "bold"),
+        axis.text = element_text(size = 17),
                                  legend.position = "none")
 RE2_focal
 
@@ -563,56 +583,55 @@ RE2_focal
 # scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
 ```
 
-```{r LE2 back focal length figure}
-
-pdf(file = "Figures/LE2_back_focal.pdf", width = 8.8,  height = 8)
-LE2_focal
-dev.off()
-
-```
-
-```{r supplementary back focal length figure}
+```{r figure S3: back focal length boxplots}
 
 fig.a <- LE1_focal +
   theme(axis.title.y = element_blank()) + 
   theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 0.5, 0.5), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
   
 fig.a
 
 fig.b <- RE1_focal +
   theme(axis.title.y = element_blank()) + 
   theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 0.5, 0), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
   
 fig.b
 
 fig.c <- LE2_focal +
   theme(axis.title.y = element_blank()) + 
   theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 0.5, 0.5), "cm"),
-        axis.title.x = element_text(size = 25, face = "bold"),
-        axis.text = element_text(size = 18, face = "bold"))
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"),
+        axis.title.x = element_text(size = 20, face = "plain"),
+        axis.text = element_text(size = 17))
   
 fig.c
 
 fig.d <- RE2_focal +
   theme(axis.title.y = element_blank()) + 
    theme(legend.position = "none",
-        plot.margin = unit(c(0, 0, 0.5, 0), "cm"))
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"))
   
 fig.d
 
 # Creating common axis labels
 y.grob <- textGrob("Back focal length (µm)", 
                    gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90, vjust = 0.5)
+                             fontsize = 25), rot = 90, 
+                             vjust = 0.6,
+                             hjust = 0.5)
 
 # Use cowplot package to nicely plot the graphs together 
 focal_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
                    #list of plots to arrange in grid
                    rel_widths = c(6, 6),
-                   nrow = 2)
+                   labels = c("A","B","C","D"), # panel labels for figure
+                   label_size = 23,
+                   hjust = 0.3, # adjustment for panel labels
+                   vjust = 0.9,
+                   nrow = 2) +
+  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
 
 plot_grid(focal_supplement_plot)
 
@@ -620,6 +639,56 @@ plot_grid(focal_supplement_plot)
 cairo_pdf(file = "Figures/focal_supplement_plot.pdf", width = 13,  height = 8) # cairo_pdf is able to handle special characters
 grid.arrange(arrangeGrob(focal_supplement_plot, left = y.grob))
 dev.off()
+```
+
+```{r figure 5: sharpness curve & maximum sharpness & focal length}
+
+# making individual panels 
+fig.f <- plot_grid(LE2_edge_plot,
+                   labels = "F",
+                   label_size = 23,
+                   hjust = 0.8, # adjustment for panel labels
+                   vjust = 0.1) +
+  theme(plot.margin = unit(c(20, 25, 20, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+fig.f
+  
+fig.b <- LE2_max_edge +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.title.y = element_text(size = 25)) +
+  theme(plot.margin = unit(c(20, 20, 20, 20), "points"))
+fig.b
+
+fig.c <- LE2_focal +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 25)) +
+  theme(plot.margin = unit(c(20, 20, 20, 20), "points"))
+fig.c
+
+# stacking panel g and h in one column
+fig.gh <- plot_grid(fig.b, NULL, fig.c,
+                     rel_heights = c(6, 0.1, 6),
+                     align = "v",
+                     ncol = 1,
+                     labels = c("G", "", "H"),
+                     label_size = 23,
+                     hjust = 0.8, # adjustment for panel labels
+                     vjust = 0.1) +
+  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+fig.gh
+
+# assembling the final figure
+fig.fgh <- plot_grid(fig.f, fig.gh,
+                     rel_widths = c(1,1),
+                     nrow = 1)
+fig.fgh
+
+# writiing to pdf
+pdf(file = "Figures/LE2_hanging_drop.pdf", width = 20,  height = 10)
+fig.fgh
+dev.off()
+
 ```
 
 ## Ophthalmoscope
@@ -640,7 +709,7 @@ LE1_oph <- oph_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
                                  legend.position = "none")
 LE1_oph
 
@@ -658,7 +727,7 @@ LE2_oph <- oph_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
                                  legend.position = "none")
 LE2_oph
 
@@ -676,7 +745,7 @@ RE1_oph <- oph_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
                                  legend.position = "none")
 RE1_oph
 
@@ -695,7 +764,7 @@ RE2_oph <- oph_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
                                  legend.position = "none")
 RE2_oph
 
@@ -724,7 +793,7 @@ E1_LR_oph <- oph_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
                                  legend.position = "none")
 E1_LR_oph 
 
@@ -778,7 +847,7 @@ E2_LR_oph <- oph_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 30, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 30, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 20),
                                  legend.position = "none")
 E2_LR_oph 
 
@@ -795,7 +864,7 @@ E2_LR_oph
 
 ```
 
-```{r ophthalmoscope figure}
+```{r figure 6: ophthalmoscope}
 
 # Make panels 
 fig.a <- E1_LR_oph +
@@ -947,7 +1016,7 @@ E1_LR_control_oph_plot <- LR_oph_data %>%
   ggplot(aes(y= bestimagereciprocal.LE1, x = bestimagereciprocal.RE1)) +
   labs(title=NULL, x = "Right eye 1", y = "Left eye 1") +
   geom_smooth(method = "lm", color = "#009E73", fill = "#009E73") +
-  geom_point(alpha = 0.8) +
+  geom_point(alpha = 0.7, size = 2.5) +
   scale_x_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2, 0.3),
                      label = c("5", "10", "∞", "10","5", "3.3")) +
   scale_y_continuous(breaks = c(-0.2, 0, 0.2, 0.4),
@@ -968,7 +1037,7 @@ E1_LR_191_oph_plot <- LR_oph_data %>%
   ggplot(aes(y= bestimagereciprocal.LE1, x = bestimagereciprocal.RE1)) +
   labs(title=NULL, x="Right eye 1", y = "Left eye 1") +
   geom_smooth(method = "lm", color = "#E69F00", fill = "#E69F00") +
-  geom_point(alpha = 0.8) +
+  geom_point(alpha = 0.7, size = 2.5) +
   scale_x_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
                      label = c("5", "10", "∞", "10","5")) +
   scale_y_continuous(breaks = c(-0.2, 0, 0.2, 0.4),
@@ -989,7 +1058,11 @@ E1_LR_249_oph_plot <- LR_oph_data %>%
   ggplot(aes(y= bestimagereciprocal.LE1, x = bestimagereciprocal.RE1)) +
   labs(title=NULL, x="Right eye 1", y = "Left eye 1") +
   geom_smooth(method = "lm", color = "#D55E00", fill = "#D55E00") +
-  geom_point(alpha = 0.8) +
+  geom_point(alpha = 0.7, size = 2.5) +
+  scale_x_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
+                     label = c("5", "10", "∞", "10","5")) +
+  scale_y_continuous(breaks = c(-0.1, 0, 0.1, 0.2),
+                     label = c("10", "∞", "10", "5")) +
   theme_classic() +
   annotate(geom="text", x = 0.185, y = 0.25, 
            label= expression("R"^2*" = -0.124"),
@@ -1007,7 +1080,7 @@ E2_LR_control_oph_plot <- LR_oph_data %>%
   ggplot(aes(y= bestimagereciprocal.LE2, x = bestimagereciprocal.RE2)) +
   labs(title=NULL, x="Right eye 2", y = "Left eye 2") +
   geom_smooth(method = "lm", color = "#009E73", fill = "#009E73") +
-  geom_point(alpha = 0.8) +
+  geom_point(alpha = 0.7, size = 2.5) +
   scale_x_continuous(breaks = c(-0.1, 0, 0.1, 0.2),
                      label = c("10", "∞", "10","5")) +
   scale_y_continuous(breaks = c(-0.2, 0, 0.2, 0.4),
@@ -1028,7 +1101,7 @@ E2_LR_191_oph_plot <- LR_oph_data %>%
   ggplot(aes(y= bestimagereciprocal.LE2, x = bestimagereciprocal.RE2)) +
   labs(title=NULL, x="Right eye 2", y = "Left eye 2") +
   geom_smooth(method = "lm", color = "#E69F00", fill = "#E69F00") +
-  geom_point(alpha = 0.8) +
+  geom_point(alpha = 0.7, size = 2.5) +
   scale_x_continuous(breaks = c(-0.1, 0, 0.1, 0.2),
                      label = c("10", "∞", "10","5")) +
   scale_y_continuous(breaks = c(-0.2, 0, 0.2, 0.4),
@@ -1049,7 +1122,7 @@ E2_LR_249_oph_plot <- LR_oph_data %>%
   ggplot(aes(y= bestimagereciprocal.LE2, x = bestimagereciprocal.RE2)) +
   labs(title=NULL, x="Right eye 2", y = "Left eye 2") +
   geom_smooth(method = "lm", color = "#D55E00", fill = "#D55E00") +
-  geom_point(alpha = 0.8) +
+  geom_point(alpha = 0.7, size = 2.5) +
   scale_x_continuous(breaks = c(-0.1, -0.05, 0, 0.05),
                      label = c("10", "20", "∞", "20")) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1),
@@ -1066,9 +1139,10 @@ E2_LR_249_oph_plot
 
 ```
 
-```{r left right asymmetry supplementary figure}
+```{r figure S4: ophthalmoscope left right asymmetry}
 
-fig.a <- E1_LR_control_oph_plot  #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+# Making panels
+fig.a <- E1_LR_control_oph_plot
 
 fig.b <- E1_LR_191_oph_plot 
 
@@ -1080,16 +1154,17 @@ fig.e <- E2_LR_191_oph_plot
 
 fig.f <- E2_LR_249_oph_plot
 
-
-        plot.margin = unit(c(0, 0, 0, 0), "cm")
 # Creating common axis labels
-y.grob <- textGrob("Reciprocal object distance", 
+y.grob <- textGrob("Object distance (mm)", 
                    gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90, vjust = 0.5)
+                             fontsize = 25), rot = 90, 
+                             vjust = 0.8,
+                             hjust = 0.2)
 
-x.grob <- textGrob("Reciprocal object distance",
+x.grob <- textGrob("Object distance (mm)",
                    gp = gpar(fontface = "bold",
-                             fontsize = 25))
+                             fontsize = 25),
+                             vjust = -0.9)
 
 # Building the figure
 LR_oph_asymmetry <- plot_grid(fig.a, fig.b, fig.c, fig.d, fig.e, fig.f,
@@ -1098,22 +1173,23 @@ LR_oph_asymmetry <- plot_grid(fig.a, fig.b, fig.c, fig.d, fig.e, fig.f,
            labels = c("A","B","C","D", "E", "F"), # panel labels for figure
            label_size = 28,
            hjust = -.1, # adjustment for panel labels
-           nrow = 2) # number of rows in grids
-
+           nrow = 2) + # number of rows in grids
+           theme(plot.margin = unit(c(10, 10, 20, 25), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+  
 LR_oph_asymmetry
 
 # adding common x axis label
 LR_asymmetry_xlab <- plot_grid(LR_oph_asymmetry, x.grob,
-                                 ncol = 1, rel_heights = c(1, .1))
+                                 ncol = 1, rel_heights = c(1, 0.04))
 plot_grid(LR_asymmetry_xlab)
 
 # extracting legend from another figure and increasing size
 legend_large <- get_legend(LE1_edge_plot + 
-              theme(legend.position = "bottom",
-              legend.key.size = unit(1, 'cm'), #change legend key size
-              legend.key.height = unit(1, 'cm'), #change legend key height
-              legend.key.width = unit(1, 'cm'), #change legend key width
-              legend.text = element_text(size=16))) #change legend text font size) # legend is laid out horizontally
+              theme(legend.position = "bottom", # legend is laid out horizontally
+              legend.key.size = unit(1.2, 'cm'), #change legend key size
+              legend.key.height = unit(1.2, 'cm'), #change legend key height
+              legend.key.width = unit(1.2, 'cm'), #change legend key width
+              legend.text = element_text(size=18))) #change legend text font size) 
 
 # Print graph
 cairo_pdf(file = "Figures/LvR_asymmetry_supplement.pdf", width = 23,  height = 13) # cairo_pdf is able to handle special characters
@@ -1125,6 +1201,7 @@ dev.off()
 ```
 
 ## Behaviour
+
 ```{r calculating total strikes & hunting success}
 
 # Creating total strike and percentage hunting success columns
@@ -1145,6 +1222,7 @@ behaviour_data <- behaviour_data %>%
 
 ### Missed strikes 
 Normal light
+
 ```{r normal light missed strikes}
 
 ## horizontal arena
@@ -1182,6 +1260,7 @@ missed_strikes_vertical
 
 ### Succesful strikes 
 Normal light
+
 ```{r normal light succesful strikes}
 
 ## horizontal arena
@@ -1221,6 +1300,7 @@ succesful_strikes_vertical
 
 ### Hunting success
 Normal light
+
 ```{r normal light hunting success}
 
 ### separate probes
@@ -1301,6 +1381,7 @@ hunting_vertical_pooled
 
 ### Total strikes 
 Normal light
+
 ```{r normal light total strikes}
 
 # horizontal arena
@@ -1338,6 +1419,7 @@ total_strikes_vertical
 
 ### Latency 
 Normal light
+
 ```{r normal light latency}
 
 ### separate probes
@@ -1428,6 +1510,7 @@ latency_vertical_pooled
 
 ### Missed strikes
 Dark
+
 ```{r dark missed strikes}
 
 ## horizontal arena
@@ -1465,6 +1548,7 @@ dark_missed_strikes_vertical
 
 ### Succesful strikes
 Dark
+
 ```{r dark succesful strikes}
 
 ## horizontal arena
@@ -1502,6 +1586,7 @@ dark_succesful_strikes_vertical
 
 ### Hunting success
 Dark
+
 ```{r dark hunting success}
 
 ### separate probes
@@ -1555,8 +1640,7 @@ dark_hunting_horizontal_pooled <- behaviour_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-         axis.text.y = element_text(size = 30, face = "bold"),
-        axis.text.x = element_text(size = 30),
+        axis.text = element_text(size = 30),
         legend.position = "none")
 dark_hunting_horizontal_pooled
 
@@ -1573,14 +1657,14 @@ dark_hunting_vertical_pooled <- behaviour_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-         axis.text.y = element_text(size = 30, face = "bold"),
-        axis.text.x = element_text(size = 30),
+        axis.text = element_text(size = 30),
         legend.position = "none")
 dark_hunting_vertical_pooled
 ```
 
 ### Total strikes
 Dark
+
 ```{r dark total strikes}
 
 # horizontal arena
@@ -1618,6 +1702,7 @@ dark_total_strikes_vertical
 
 ### Latency
 Dark
+
 ```{r dark latency}
 
 ### separate probes
@@ -1678,8 +1763,7 @@ dark_latency_horizontal_pooled <- behaviour_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-         axis.text.y = element_text(size = 30, face = "bold"),
-        axis.text.x = element_text(size = 30),
+        axis.text = element_text(size = 30),
                                  legend.position = "none")
 dark_latency_horizontal_pooled
 
@@ -1701,13 +1785,12 @@ dark_latency_vertical_pooled <- behaviour_data %>%
   theme_classic() +
   theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
         axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-         axis.text.y = element_text(size = 30, face = "bold"),
-        axis.text.x = element_text(size = 30),
+        axis.text = element_text(size = 30),
                                  legend.position = "none")
 dark_latency_vertical_pooled
 ```
 
-```{r behaviour figure}
+```{r figure 7: behaviour}
 
 #make latency panels 
 fig.a <- latency_horizontal_pooled +
@@ -1815,6 +1898,7 @@ dev.off()
 # Statistics
 
 ## qPCR
+
 ```{r qPCR stats}
 
 ## Test for normality
@@ -1839,6 +1923,7 @@ summary(res_qPCR_aov)
 ```
 
 ## Edge sharpness series
+
 ```{r edge sharpness stats}
 
 ## Test for normality
@@ -1875,6 +1960,7 @@ res_edge_kw
 ```
 
 ## Back focal length
+
 ```{r back focal length stats}
 
 ## Test for normality
@@ -1916,6 +2002,7 @@ summary(res_focal_aov)
 ```
 
 ## Ophthalmoscope
+
 ```{r ophthalmoscope stats}
 
 ## Test for normality
@@ -1956,6 +2043,7 @@ summary(res_oph_kw)
 
 ## Normal light conditions
 ### Latency separate probes
+
 ```{r normal light latency separate probes}
 
 ## Test for normality 
@@ -1990,6 +2078,7 @@ res_latency_light_hor_kw
 
 ## Dark conditions
 ### Latency separate probes
+
 ```{r dark behaviour latency stats separate probes}
 
 ## Horizontal
@@ -2059,6 +2148,7 @@ res_latency_dark_vertical
 ```
 
 ### Latency pooled probes
+
 ```{r dark behaviour latency stats pooled probes}
 
 ## Horizontal
@@ -2137,6 +2227,7 @@ res_latency_dark_vertical_pooled_t
 ```
 
 ### Hunting success pooled probes
+
 ```{r dark behaviour latency stats pooled probes}
 
 ## Horizontal
