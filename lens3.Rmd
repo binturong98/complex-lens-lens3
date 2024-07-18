@@ -28,6 +28,7 @@ library(plotly)
 library(ggpubr)
 library(ggformula)
 library(ggplotify)
+library(magick)
 library(rstatix)
 library(Cairo)
 
@@ -1384,8 +1385,8 @@ hunting_horizontal <- behaviour_data %>%
   geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center', # using geom_dotplot here instead of geom_jitter so that the points are stacked horizontally and centre aligned (stackdir). Important as there are only 3 values for hunting success and geom_jitter makes it seem like there are more.
         stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) + #stackratio adjusts distance between points 
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+  theme(axis.title.x = element_text(size = 40, vjust = -0.15),
+        axis.title.y = element_text(size = 40, vjust = 1.8),
         axis.text = element_text(size = 30, face = "bold"),
         legend.position = "none")
 hunting_horizontal
@@ -1415,15 +1416,15 @@ hunting_horizontal_pooled <- behaviour_data %>%
   ggplot(aes(y = hunting_success, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-   scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
-  #scale_x_discrete(labels = c(expression("control" = Control, "lens3" = italic(lens3)~RNAi))) + ## tried to write this piece of code to selectively italicise lens3 but for some reason it doesn't italicise numbers and also creates a space between lens3 and RNAi. 
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi")))) +
   labs(title=NULL,x= "", y = "% Hunting success") +
   geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
         stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text.y = element_text(size = 30, face = "bold"),
+  theme(axis.title.x = element_text(size = 40, vjust = -0.15),
+        axis.title.y = element_text(size = 38, vjust = 1.8),
+        axis.text.y = element_text(size = 30),
         axis.text.x = element_text(size = 30),
         legend.position = "none")
 hunting_horizontal_pooled
@@ -1434,14 +1435,15 @@ hunting_vertical_pooled <- behaviour_data %>%
   ggplot(aes(y = hunting_success, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi")))) +
   labs(title=NULL,x= "", y = "% Hunting success") +
   geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
         stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text.y = element_text(size = 30, face = "bold"),
+  theme(axis.title.x = element_text(size = 40, vjust = -0.15),
+        axis.title.y = element_text(size = 38, vjust = 1.8),
+        axis.text.y = element_text(size = 30),
         axis.text.x = element_text(size = 30),
         legend.position = "none")
 hunting_vertical_pooled
@@ -1537,18 +1539,19 @@ latency_horizontal_pooled <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi")))) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   #geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", # adds a significance bar
               #map_signif_level = TRUE, textsize = 5, vjust = -0.1) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-         axis.text.y = element_text(size = 30, face = "bold"),
+  theme(axis.title.x = element_text(size = 40, vjust = -0.15),
+        axis.title.y = element_text(size = 38, vjust = 1.8),
+        axis.text.y = element_text(size = 30),
         axis.text.x = element_text(size = 30),
-                                 legend.position = "none")
+        legend.position = "none")
 latency_horizontal_pooled
 
 ## vertical arena
@@ -1558,19 +1561,21 @@ latency_vertical_pooled <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi")))) +
   scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   #geom_signif(comparisons=list(c("control", "lens3")), annotations="ns", 
               #map_signif_level = TRUE, textsize = 5, vjust = -0.1) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-         axis.text.y = element_text(size = 30, face = "bold"),
+  theme(axis.title.x = element_text(size = 40, vjust = -0.15),
+        axis.title.y = element_text(size = 38, vjust = 1.8),
+        axis.text.y = element_text(size = 30),
         axis.text.x = element_text(size = 30),
-                                 legend.position = "none")
+        legend.position = "none")
 latency_vertical_pooled
+
 ```
 
 ## Dark conditions
@@ -1701,14 +1706,18 @@ dark_hunting_horizontal_pooled <- behaviour_data %>%
   ggplot(aes(y = hunting_success, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-   scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi")))) +
+  scale_y_continuous(limits = c(0, 100), 
+                     breaks = c(0, 25, 50, 75, 100)) +
   labs(title=NULL,x= "", y = "% Hunting success") +
   geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
         stackratio = 1.5, dotsize = 1.5, position = position_dodge(0.8)) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 30),
+  theme(axis.title.x = element_text(size = 40, vjust = -0.15),
+        axis.title.y = element_text(size = 38, vjust = 1.8),
+        axis.text.y = element_text(size = 30),
+        axis.text.x = element_text(size = 30),
         legend.position = "none")
 dark_hunting_horizontal_pooled
 
@@ -1718,16 +1727,21 @@ dark_hunting_vertical_pooled <- behaviour_data %>%
   ggplot(aes(y = hunting_success, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA, position = position_dodge(0.8)) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi")))) +
+  scale_y_continuous(limits = c(0, 100),
+                     breaks = c(0, 25, 50, 75, 100)) +
   labs(title=NULL,x= "", y = "% Hunting success") +
   geom_dotplot(aes(fill = NULL, alpha = 0.1), binaxis = 'y', stackdir = 'center',
         stackratio = 1.5, dotsize = 1.4, position = position_dodge(0.8)) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
-        axis.text = element_text(size = 30),
+  theme(axis.title.x = element_text(size = 40, vjust = -0.15),
+        axis.title.y = element_text(size = 38, vjust = 1.8),
+        axis.text.y = element_text(size = 30),
+        axis.text.x = element_text(size = 30),
         legend.position = "none")
 dark_hunting_vertical_pooled
+
 ```
 
 ### Total strikes
@@ -1820,17 +1834,18 @@ dark_latency_horizontal_pooled <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
-  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi")))) +
+  scale_y_continuous(limits = c(0, 27), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   geom_signif(comparisons=list(c("control", "lens3")), annotations="*", # adds a significance star
               map_signif_level = TRUE, textsize = 10, 
               vjust = 0.5,
-              margin_top = 0.35) +
+              margin_top = 0.04) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+  theme(axis.title.x = element_text(size = 40, vjust = -0.15),
+        axis.title.y = element_text(size = 38, vjust = 1.8),
         axis.text = element_text(size = 30),
                                  legend.position = "none")
 dark_latency_horizontal_pooled
@@ -1842,8 +1857,9 @@ dark_latency_vertical_pooled <- behaviour_data %>%
   ggplot(aes(y= latency_min, x = group, fill = group)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#CC79A7")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi')) +
-  scale_y_continuous(limits = c(0, 26), breaks = c(0, 5, 10, 15, 20, 25)) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi")))) +
+  scale_y_continuous(limits = c(0, 27), breaks = c(0, 5, 10, 15, 20, 25)) +
   labs(title=NULL,x= "", y = "Latency (min)") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   geom_signif(comparisons=list(c("control", "lens3")), annotations="*", # adds a significance star
@@ -1851,8 +1867,8 @@ dark_latency_vertical_pooled <- behaviour_data %>%
               vjust = 0.5,
               margin_top = 0.35) +
   theme_classic() +
-  theme(axis.title.x = element_text(size = 40, face = "bold", vjust = -0.15),
-        axis.title.y = element_text(size = 40, face = "bold", vjust = 1.8),
+  theme(axis.title.x = element_text(size = 40, vjust = -0.15),
+        axis.title.y = element_text(size = 38, vjust = 1.8),
         axis.text = element_text(size = 30),
                                  legend.position = "none")
 dark_latency_vertical_pooled
@@ -1863,28 +1879,32 @@ dark_latency_vertical_pooled
 #make latency panels 
 fig.a <- latency_horizontal_pooled +
   labs(y = NULL) +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        plot.margin = unit(c(1.5, 0, 0, 1), "cm")) + #The order of edges for plot.margin is unit(c(top, right, bottom, left), units) 
   coord_cartesian(clip = "off") 
 
 fig.a
 
 fig.b <- latency_vertical_pooled +
   labs(y = NULL) +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        plot.margin = unit(c(1.5, 0, 0, 0.5), "cm")) +
   coord_cartesian(clip = "off")
 
 fig.b
 
 fig.c <- dark_latency_horizontal_pooled +
   labs(y = NULL) +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        plot.margin = unit(c(1.5, 0, 0, 1), "cm")) +
   coord_cartesian(clip = "off") 
 
 fig.c
 
 fig.d <- dark_latency_vertical_pooled +
   labs(y = NULL) +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        plot.margin = unit(c(1.5, 0, 0, 0.5), "cm")) +
   coord_cartesian(clip = "off")
 
 fig.d
@@ -1892,10 +1912,14 @@ fig.d
 # use cowplot package to nicely plot the graphs together 
 latency_plot <- plot_grid(fig.a, fig.c, fig.b, fig.d, 
                    #list of plots to arrange in grid
-                   rel_widths = c(6, 6, 6, 6),
+                   rel_widths = c(6, 6),
                    axis = c("b", "b", "b", "b"),
                    ncol = 2,
-                   vjust = 1)
+                   align = "v",
+                   labels = c("A","B","C","D"), # panel labels for figure
+                   label_size = 23,
+                   hjust = -0.45, # adjustment for panel labels
+                   vjust = 1.4)
 
 plot_grid(latency_plot)
 
@@ -1907,42 +1931,50 @@ y.grob.latency <- textGrob("Latency (min)",
 latency_plot_axis <- grid.arrange(arrangeGrob(latency_plot, left = y.grob.latency)) #adding common y axis
 
 
-#make hunting success panels 
+# make hunting success panels 
 fig.e <- hunting_horizontal_pooled +
   labs(y = NULL) +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        plot.margin = unit(c(1.5, 0, 0, 1), "cm")) + #The order of edges for plot.margin is unit(c(top, right, bottom, left), units) 
   coord_cartesian(clip = "off") 
 
 fig.e
 
 fig.f <- hunting_vertical_pooled +
   labs(y = NULL) +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        plot.margin = unit(c(1.5, 0, 0, 0.5), "cm")) +
   coord_cartesian(clip = "off")
 
 fig.f
 
 fig.g <- dark_hunting_horizontal_pooled +
   labs(y = NULL) +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        plot.margin = unit(c(1.5, 0, 0, 1), "cm")) +
   coord_cartesian(clip = "off") 
 
 fig.g
 
 fig.h <- dark_hunting_vertical_pooled +
   labs(y = NULL) +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        plot.margin = unit(c(1.5, 0, 0, 0.5), "cm")) +
   coord_cartesian(clip = "off")
 
 fig.h
 
 # use cowplot package to nicely plot the graphs together
-hunting_plot <- plot_grid(fig.e, fig.f, fig.g, fig.h, 
-                   #list of plots to arrange in grid
-                   rel_widths = c(6, 6, 6, 6),
+hunting_plot <- plot_grid(fig.e, fig.g, fig.f, fig.h, 
+                   # list of plots to arrange in grid
+                   rel_widths = c(6, 6),
                    axis = c("b", "b", "b", "b"),
                    ncol = 2,
-                   vjust = 1) 
+                   align = "v",
+                   labels = c("E","F","G","H"), # panel labels for figure
+                   label_size = 23,
+                   hjust = -0.45, # adjustment for panel labels
+                   vjust = 1.4) 
 
 plot_grid(hunting_plot)
 
@@ -1951,14 +1983,51 @@ y.grob.hunting <- textGrob("% Hunting success",
                    gp = gpar(fontface = "bold",
                              fontsize = 30), rot = 90)
 
-hunting_plot_axis <- grid.arrange(arrangeGrob(hunting_plot, left = y.grob.hunting)) #adding common y axis
+hunting_plot_axis <- grid.arrange(arrangeGrob(hunting_plot, left = y.grob.hunting)) # adding common y axis
 
-behaviour_figure <- grid.arrange(arrangeGrob(latency_plot_axis, hunting_plot_axis, nrow = 2))
+behaviour_plots <- grid.arrange(arrangeGrob(latency_plot_axis, hunting_plot_axis, nrow = 2))
 
-#print graph
+plot_grid(behaviour_plots)
+
+# Adding larval silhouette and light icons
+
+## making space for icons
+### adding a column for larva silhouettes
+behaviour_figure <- plot_grid(NULL, behaviour_plots, NULL,
+                 rel_widths = c(0.2, 6, 1.2),
+                 ncol = 3)
+
+# adding a row for the light arena icons
+behaviour_figure <- plot_grid(NULL, behaviour_figure,
+                  rel_heights = c(0.5, 6),
+                  nrow = 2)
+
+plot_grid(behaviour_figure)
+
+# loading .png icons into environment
+larva_h_icon <- "larva_horizontal.png"
+larva_v_icon <- "larva_vertical.png"
+bright_icon <- "bright_light.png"
+dim_icon <- "dim_light.png"
+
+# drawing icons onto the final figure
+behaviour_final <- ggdraw() +
+  draw_plot(behaviour_figure) +
+  # horizontal larva silhouettes
+  draw_image(image = larva_h_icon, x = 0.41, y =  0.35, scale = 0.13) +
+  draw_image(image = larva_h_icon, x = 0.41, y =  -0.11, scale = 0.13) +
+  # vertical larva silhouettes
+  draw_image(image = larva_v_icon, x = 0.41, y =  0.11, scale = 0.13) +
+  draw_image(image = larva_v_icon, x = 0.41, y =  -0.35, scale = 0.13) +
+  # bright & dim light vectors
+  draw_image(image = bright_icon, x = -0.2405, y =  0.45, scale = 0.083) +
+  draw_image(image = dim_icon, x = 0.165, y =  0.441, scale = 0.065)
+
+behaviour_final
+
+# print graph
 pdf(file = "Figures/behaviour.pdf", width = 15,  height = 16)
-grid.arrange(arrangeGrob(latency_plot_axis, hunting_plot_axis,
-                         nrow = 2)) #stacking the latency and hunting success plots on top of each other
+behaviour_final
 dev.off()
 
 ```
@@ -2011,7 +2080,7 @@ horizontal_bright_spec <- spec_data %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
   geom_segment(aes(xend = wavelength, yend = 0, 
                    colour = nm_to_RGB(wavelength))) +
-  geom_line() +
+  geom_spline() +
   scale_colour_identity() +
   xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
   scale_x_continuous(limits = c(300, 750), 
@@ -2051,7 +2120,7 @@ vertical_bright_spec
 horizontal_dark_spec <- spec_data %>%
   filter(arena == "horizontal" & light_environment == "dark") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
-  geom_line() +
+  geom_spline() +
   scale_x_continuous(limits = c(300, 750), 
                      breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
   scale_y_continuous(limits = c(0, 0.065),
@@ -2418,7 +2487,7 @@ res_latency_dark_vertical_pooled_t
 
 ### Hunting success pooled probes
 
-```{r dark behaviour latency stats pooled probes}
+```{r dark behaviour hunting success pooled probes}
 
 ## Horizontal
 # Building the linear model

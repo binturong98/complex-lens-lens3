@@ -85,7 +85,7 @@ C13,control,vertical,1,2,0,0,24.16,NA,normal,NA
 191_F8,lens3_191,horizontal,0,2,0,NA,7.37,0,dark,0
 191_F8,lens3_191,vertical,2,2,0,NA,3.24,4,dark,2
 191_F9,lens3_191,horizontal,0,3,1,0,1.32,0,dark,1
-191_F9,lens3_191,vertical,1,3,0,NA,0.32,0,dark,0
+191_F9,lens3_191,vertical,1,3,0,NA,6.44,0,dark,0
 191_F11,lens3_191,horizontal,0,2,0,NA,9.55,0,dark,0
 191_F11,lens3_191,vertical,0,1,0,NA,8.04,2,dark,0
 249_F2,lens3_249,horizontal,0,2,0,NA,16.22,0,dark,0
@@ -102,7 +102,7 @@ C13,control,vertical,1,2,0,0,24.16,NA,normal,NA
 249_F8,lens3_249,horizontal,2,2,0,NA,2.06,0,dark,1
 249_F8,lens3_249,vertical,0,2,0,NA,6.03,1,dark,0
 249_F9,lens3_249,horizontal,4,2,0,NA,8.06,0,dark,0
-249_F9,lens3_249,vertical,5,1,1,1,0.45,10,dark,2
+249_F9,lens3_249,vertical,5,1,1,1,12.56,10,dark,2
 249_F10,lens3_249,horizontal,0,3,1,0,3.33,0,dark,0
 249_F10,lens3_249,vertical,5,2,0,NA,10.47,1,dark,4
 249_F11,lens3_249,horizontal,3,1,0,NA,11.22,0,dark,1
@@ -114,6 +114,7 @@ C_F1,control,vertical,2,1,0,NA,6.01,0,dark,2
 C_F2,control,horizontal,4,3,2,1,1.43,2,dark,0
 C_F2,control,vertical,0,2,0,NA,2.11,1,dark,0
 C_F3,control,horizontal,0,3,0,NA,2.22,0,dark,0
+C_F3,control,vertical,3,1,0,NA,0.2,0,dark,0
 C_F4,control,horizontal,3,3,0,NA,1.46,0,dark,2
 C_F6,control,horizontal,1,2,0,NA,0.22,1,dark,1
 C_F6,control,vertical,1,2,0,NA,7.57,1,dark,1
