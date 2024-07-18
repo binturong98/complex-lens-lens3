@@ -26,9 +26,11 @@ library(grid)
 library(gridExtra)
 library(plotly)
 library(ggpubr)
-library(rstatix)
+library(ggformula)
 library(ggplotify)
+library(rstatix)
 library(Cairo)
+
 ```
 
 # Data and subsetting
@@ -51,13 +53,16 @@ qpcr_data <- read.csv("lens3_qPCR.csv", header = TRUE)
 # Hanging drops
 edge_data <- read.csv("lens3_edge_sharpness_long.csv", header = TRUE)
 
-focal_data <- read.csv("back_focal_length.csv", header = TRUE)
+hang_data <- read.csv("lens3_hanging_drops.csv", header = TRUE)
 
 # Ophthalmoscope
 oph_data <- read.csv("lens3_ophthalmoscope.csv", header = TRUE)
 
 # Behaviour
 behaviour_data <- read.csv("lens3_behaviour.csv", header = TRUE)
+
+# Behaviour arena spectrophotometer
+spec_data <- read.csv("behaviour_arena_spec.csv", header = TRUE)
 
 # na.strings converts "NA", "" and " " into na within the body of the file
 
@@ -81,7 +86,9 @@ qPCR_plot <- qpcr_data %>%
   ggplot(aes(y= log_fold_gene_expression, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   labs(title=NULL,x = NULL, y = "Log fold gene expression") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
   geom_signif(comparisons=list(c("control", "lens3_249")), annotations="*", # adds a significance star
@@ -129,8 +136,14 @@ LE1_edge_plot <- edge_data %>%
               method = 'loess',
               formula = 'y ~ x',
               aes(fill = eye_probe, colour = eye_probe)) +
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+   scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), 
+                    labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), 
+                    labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
   scale_x_continuous("Distance from back surface of lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
@@ -152,9 +165,15 @@ LE2_edge_plot <- edge_data %>%
   stat_smooth(span = 0.1, se = TRUE,
               method = 'loess',
               formula = 'y ~ x',
-              aes(fill = eye_probe, colour = eye_probe))+
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+              aes(fill = eye_probe, colour = eye_probe)) +
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), 
+                    labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), 
+                    labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
   scale_x_continuous("Distance from back surface of lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
@@ -182,8 +201,14 @@ RE1_edge_plot <- edge_data %>%
               method = 'loess',
               formula = 'y ~ x',
               aes(fill = eye_probe, colour = eye_probe)) +
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), 
+                    labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), 
+                    labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
   scale_x_continuous("Distance from back surface of lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
@@ -206,8 +231,14 @@ RE2_edge_plot <- edge_data %>%
               method = 'loess',
               formula = 'y ~ x',
               aes(fill = eye_probe, colour = eye_probe)) +
-  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) +
-  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), labels = c("Control", "lens3RNAi P1", "lens3RNAi P2")) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
+  scale_colour_manual(values = c("#009E73", "#E69F00", "#D55E00"), 
+                    labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
+  scale_fill_manual(values = c("#009E73", "#E69F00", "#D55E00"), 
+                    labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) + # For some reason, if labels are not specified in both colour and fill, they are plotted twice. Weird
   scale_x_continuous("Distance from back surface of lens (µm)", 
                      breaks = c(250, 350, 450, 550), 
                      limits = c(185, 600)) +
@@ -223,7 +254,7 @@ RE2_edge_plot
 
 # Plot for a single individual
 individual_edge_plot <- edge_data %>%
-  filter(individual == "249_18") %>%
+  filter(individual == "C12") %>%
   ggplot(aes(y= contrast, x = distance, group = eye)) +
   geom_point(aes(fill = eye_probe, colour = eye_probe)) +
   scale_colour_manual(values = c("#56B4E9", "#E69F00", "#0072B2", "#D55E00")) +
@@ -236,7 +267,7 @@ individual_edge_plot <- edge_data %>%
         axis.text = element_text(size = 15, face = "bold"),
         legend.title = element_blank(),
         legend.text = element_text(size = 15))
-individual_edge_plot 
+ggplotly(individual_edge_plot) 
 
 # Unused but useful bit of code:
 # Melting the data by distance to make it long format:
@@ -246,17 +277,33 @@ individual_edge_plot
 # edge_data_long$left <- str_detect(edge_data_long$variable, "L") 
 ```
 
-Comparing maximum edge sharpness values between controls and tests. This usually corresponds to the second peak/image. However, sometimes the first peak has higher edge sharpness in the knockdowns; That's some of the eyes of some individuals (3/10) for Probe 1 and for Probe 2 (4/10). In some eyes of Probe 2 individuals (2/10), best focused images could not be detected in the edge sharpness plots or manually
+Comparing maximum edge sharpness values between controls and tests. This usually corresponds to the second peak/image. However, sometimes the first peak has higher edge sharpness. This happens more often in knockdowns; That's some of the eyes of some individuals (3/10) for Probe 1 and for Probe 2 (4/10) and just right eyes in one control individual. In some eyes of Probe 2 individuals (2/10; 249.13 - LE2, 249.17 - LE1, RE1), best focused images could not be detected in the edge sharpness plots or manually
+
+Control
+C12 - RE1, RE2
+
+Probe 1
+191.20 - RE1
+191.22 - LE1, RE1, RE2
+191.23 - LE1
+
+Probe 2
+249.9 - LE1, LE2
+249.13 - LE1
+249.15 - LE2
+249.18 - RE2
 
 ```{r maximum edge sharpness boxplots}
 
 # LE1
-LE1_max_edge <- focal_data %>%
+LE1_max_edge <- hang_data %>%
   filter(eye == "LE1") %>%
   ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(limits = c(0, 8.2), breaks = c(1, 3, 5, 7)) +
   labs(title=NULL,x="Left eye 1", y = "Maximum edge sharpness") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -272,13 +319,15 @@ LE1_max_edge <- focal_data %>%
 LE1_max_edge
 
 # LE2
-LE2_max_edge <- focal_data %>%
+LE2_max_edge <- hang_data %>%
   filter(eye == "LE2") %>%
   ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   scale_y_continuous(limits = c(0, 8.75), breaks = c(2, 4, 6, 8)) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   labs(title=NULL,x="Left eye 2", y = "Maximum edge sharpness") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) +
   geom_signif(comparisons=list(c("control", "lens3_249")), annotations="*", # adds a significance star
@@ -293,12 +342,14 @@ LE2_max_edge <- focal_data %>%
 LE2_max_edge
 
 # RE1
-RE1_max_edge <- focal_data %>%
+RE1_max_edge <- hang_data %>%
   filter(eye == "RE1") %>%
   ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(limits = c(0, 8.2), breaks = c(1, 3, 5, 7)) +
   labs(title=NULL,x="Right eye 1", y = "Maximum edge sharpness") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) +
@@ -314,12 +365,14 @@ RE1_max_edge <- focal_data %>%
 RE1_max_edge
 
 # RE2
-RE2_max_edge <- focal_data %>%
+RE2_max_edge <- hang_data %>%
   filter(eye == "RE2") %>%
   ggplot(aes(y= maximum_sharpness, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(limits = c(0, 8.75), breaks = c(2, 4, 6, 8)) +
   labs(title=NULL,x="Right eye 2", y = "Maximum edge sharpness") +
   geom_jitter(shape = 19, size = 3.5, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -508,12 +561,14 @@ Only using the 2nd (typically taller) peak for this because the 1st is often har
 ```{r back focal length boxplots}
 
 # LE1
-LE1_focal <- focal_data %>%
+LE1_focal <- hang_data %>%
   filter(eye == "LE1") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(limits = c(250, 500), 
                      breaks = c(300, 350, 400, 450, 500)) +
   labs(title=NULL,x="Left eye 1", y = "Back focal length (µm)") +
@@ -526,12 +581,14 @@ LE1_focal <- focal_data %>%
 LE1_focal
 
 # LE2
-LE2_focal <- focal_data %>%
+LE2_focal <- hang_data %>%
   filter(eye == "LE2") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(limits = c(250, 500), 
                      breaks = c(300, 350, 400, 450, 500)) +
   labs(title=NULL,x="Left eye 2", y = "Back focal length (µm)") +
@@ -544,12 +601,14 @@ LE2_focal <- focal_data %>%
 LE2_focal
 
 # RE1
-RE1_focal <- focal_data %>%
+RE1_focal <- hang_data %>%
   filter(eye == "RE1") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(limits = c(250, 500), 
                      breaks = c(300, 350, 400, 450, 500)) +
   labs(title=NULL,x="Right eye 1", y = "Back focal length") +
@@ -562,12 +621,14 @@ RE1_focal <- focal_data %>%
 RE1_focal
 
 # RE2
-RE2_focal <- focal_data %>%
+RE2_focal <- hang_data %>%
   filter(eye == "RE2") %>%
   ggplot(aes(y= peak_2_um, x = probe, fill = probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(limits = c(250, 500), 
                      breaks = c(300, 350, 400, 450, 500)) +
   labs(title=NULL,x="Right eye 2", y = "Back focal length") +
@@ -646,8 +707,8 @@ dev.off()
 # making individual panels 
 fig.f <- plot_grid(LE2_edge_plot,
                    labels = "F",
-                   label_size = 23,
-                   hjust = 0.8, # adjustment for panel labels
+                   label_size = 29.5,
+                   hjust = 1.2, # adjustment for panel labels
                    vjust = 0.1) +
   theme(plot.margin = unit(c(20, 25, 20, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
 fig.f
@@ -671,7 +732,7 @@ fig.gh <- plot_grid(fig.b, NULL, fig.c,
                      align = "v",
                      ncol = 1,
                      labels = c("G", "", "H"),
-                     label_size = 23,
+                     label_size = 29.5,
                      hjust = 0.8, # adjustment for panel labels
                      vjust = 0.1) +
   theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
@@ -680,11 +741,11 @@ fig.gh
 
 # assembling the final figure
 fig.fgh <- plot_grid(fig.f, fig.gh,
-                     rel_widths = c(1,1),
+                     rel_widths = c(1.2, 1),
                      nrow = 1)
 fig.fgh
 
-# writiing to pdf
+# writing to pdf
 pdf(file = "Figures/LE2_hanging_drop.pdf", width = 20,  height = 10)
 fig.fgh
 dev.off()
@@ -702,7 +763,9 @@ LE1_oph <- oph_data %>%
   geom_boxplot(alpha = 0.8) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Left Eye 1", y = "Object distance (mm)") +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
                      label = c("5", "10", "∞", "10","5")) + # reciprocal for image distance
   geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -720,7 +783,9 @@ LE2_oph <- oph_data %>%
   geom_boxplot(alpha = 0.8) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Left Eye 2", y = "Object distance (mm)") +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
                      label = c("5", "10", "∞", "10","5")) +
   geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -738,7 +803,9 @@ RE1_oph <- oph_data %>%
   geom_boxplot(alpha = 0.8) +
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Right Eye 1", y = "Object distance (mm)") +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
                      label = c("5", "10", "∞", "10","5")) +
   geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -757,7 +824,9 @@ RE2_oph <- oph_data %>%
   geom_boxplot(alpha = 0.8, outlier.shape = 17, outlier.size = 2, position = "dodge2") + # Changing outlier shape
   scale_fill_manual(values=c("#009E73", "#E69F00", "#D55E00")) +
   labs(title=NULL,x="Right Eye 2", y = "Object distance (mm)") +
-  scale_x_discrete(labels = c('Control', 'lens3RNAi P1', 'lens3RNAi P2')) +
+  scale_x_discrete(labels = c(expression("Control", 
+                                         paste(italic("lens3"), "RNAi P1"), 
+                                         paste(italic("lens3"), "RNAi P2")))) +
   scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
                      label = c("5", "10", "∞", "10","5")) +
   geom_jitter(shape = 19, size = 3, alpha = 0.7, position = position_jitter(0.1)) + 
@@ -781,7 +850,7 @@ oph_data$eye_probe <- factor(oph_data$eye_probe,
 # Plot for all E1s
 
 E1_LR_oph <- oph_data %>%
-  filter(grepl('E1', eye)) %>% #grepl stands for grep logical. It is a funciton that searches for matches or a string or a string vector
+  filter(grepl('E1', eye)) %>% #grepl stands for grep logical. It is a function that searches for matches or a string or a string vector
   ggplot(aes(y= bestimagereciprocal, x = eye_probe, fill = eye_probe)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   scale_fill_manual(values=c("#009E73", "#009E73", "#E69F00",  "#E69F00", "#D55E00", "#D55E00")) +
@@ -797,10 +866,10 @@ E1_LR_oph <- oph_data %>%
                                  legend.position = "none")
 E1_LR_oph 
 
-# Trying custom facet grid labels and using the labeller function
-probe.labs <- c("control" = "Control","lens3_191" = "lens3RNAi P1", "lens3_249" = "lens3RNAi P2")
+# Making custom facet grid labels for use with the labeller function
+probe.labs <- c("control" = "Control", "lens3_191" = "lens3RNAi P1", "lens3_249" = "lens3RNAi P2")
 
-# Trying to make multilevel x-axes
+# Making multilevel x-axes
 
 E1_LR_oph <- E1_LR_oph + facet_grid(~ probe, scales = "free", labeller = labeller(probe = probe.labs)) 
 
@@ -883,36 +952,35 @@ fig.b
 wide_plot <- plot_grid(fig.a, NULL, fig.b, 
                    #list of plots to arrange in grid
                    rel_widths = c(6, 0.2, 6),
-                   align = "h",
                    nrow = 1)
 
 plot_grid(wide_plot)
-
-# Print graph
-cairo_pdf(file = "Figures/ophthalmoscope_wide.pdf", width = 12,  height = 6) # cairo_pdf is able to handle special characters
-wide_plot
-dev.off()
 
 # Stacking the plots on top of each other instead of putting them side to side
 fig.a <- E1_LR_oph_fig +
 theme(legend.position = "none",
       axis.title.y = element_blank(),
       axis.text.y = element_blank()) +
-  labs(y = NULL)
+  labs(y = NULL) +
+  theme(plot.margin = unit(c(20, 10, 10, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
 
 fig.a
 
 fig.b <- E2_LR_oph +
 theme(legend.position = "none",
       strip.text.x = element_blank())+ #removing facet_grid second x axis label
-  labs(y = NULL)
+  labs(y = NULL) +
+  theme(plot.margin = unit(c(10, 10, 20, 20), "points"))
 
 fig.b
 
 # Combining plots
 
-long_plot <- plot_grid(fig.a, fig.b, align = 'v', axis = 'r',
-                       nrow = 2)
+long_plot <- plot_grid(fig.a, fig.b, 
+                       align = 'v', 
+                       axis = 'r',
+                       nrow = 2,
+                       rel_heights = c(6.5, 6))
 plot_grid(long_plot)
 
 # Creating common y axis label
@@ -959,19 +1027,6 @@ LR_oph_data <- LR_oph_data %>%
 
 # linear models of left vs right reciprocal object distance for each probe
 ## E1
-LR_E2_control_mod <- lm(bestimagereciprocal.LE2 ~ bestimagereciprocal.RE2, 
-                        data = LR_oph_data,
-                        subset = probe == "control")
-
-LR_E2_191_mod <- lm(bestimagereciprocal.LE2 ~ bestimagereciprocal.RE2, 
-                        data = LR_oph_data,
-                        subset = probe == "lens3_191")
-LR_E2_249_mod <- lm(bestimagereciprocal.LE2 ~ bestimagereciprocal.RE2, 
-                        data = LR_oph_data,
-                        subset = probe == "lens3_249")
-
-# linear models of left vs right reciprocal object distance for each probe
-## E1
 LR_E1_control_mod <- lm(bestimagereciprocal.LE1 ~ bestimagereciprocal.RE1, 
                         data = LR_oph_data,
                         subset = probe == "control")
@@ -980,6 +1035,19 @@ LR_E1_191_mod <- lm(bestimagereciprocal.LE1 ~ bestimagereciprocal.RE1,
                         data = LR_oph_data,
                         subset = probe == "lens3_191")
 LR_E1_249_mod <- lm(bestimagereciprocal.LE1 ~ bestimagereciprocal.RE1, 
+                        data = LR_oph_data,
+                        subset = probe == "lens3_249")
+
+# linear models of left vs right reciprocal object distance for each probe
+## E2
+LR_E2_control_mod <- lm(bestimagereciprocal.LE2 ~ bestimagereciprocal.RE2, 
+                        data = LR_oph_data,
+                        subset = probe == "control")
+
+LR_E2_191_mod <- lm(bestimagereciprocal.LE2 ~ bestimagereciprocal.RE2, 
+                        data = LR_oph_data,
+                        subset = probe == "lens3_191")
+LR_E2_249_mod <- lm(bestimagereciprocal.LE2 ~ bestimagereciprocal.RE2, 
                         data = LR_oph_data,
                         subset = probe == "lens3_249")
 
@@ -1895,6 +1963,128 @@ dev.off()
 
 ```
 
+## Spectrophotometer
+
+```{r spec plots}
+
+# Defining nm_to_RGB. 
+# This is a function converts a wavelength of light into a hex-string to represent a colour
+nm_to_RGB <- function(wavelengths){
+  sapply(wavelengths, function(wavelength) {
+  red <- green <- blue <- 0  
+  if((wavelength >= 380) & (wavelength < 440)){
+    red <- -(wavelength - 440) / (440 - 380)
+    blue <- 1
+  }else if((wavelength >= 440) & (wavelength<490)){
+    green <- (wavelength - 440) / (490 - 440)
+    blue <- 1
+  }else if((wavelength >= 490) && (wavelength<510)){
+    green <- 1
+    blue = -(wavelength - 510) / (510 - 490)
+  }else if((wavelength >= 510) && (wavelength<580)){
+    red = (wavelength - 510) / (580 - 510)
+    green <- 1
+  }else if((wavelength >= 580) && (wavelength<645)){
+    red = 1
+    green <- -(wavelength - 645) / (645 - 580)
+  }else if((wavelength >= 645) && (wavelength<781)){
+    red = 1
+  }
+  if((wavelength >= 380) && (wavelength<420)){
+    fac <- 0.3 + 0.7*(wavelength - 380) / (420 - 380)
+  }else if((wavelength >= 420) && (wavelength<701)){
+    fac <- 1
+  }else if((wavelength >= 701) && (wavelength<781)){
+    fac <- 0.3 + 0.7*(780 - wavelength) / (780 - 700)
+  }else{
+    fac <- 0
+  }
+  do.call(rgb, as.list((c(red, green, blue) * fac)^0.8))
+  })
+}
+
+spec_data <- spec_data %>%
+  mutate(across(c("absolute_irradiance"), abs))
+
+horizontal_bright_spec <- spec_data %>%
+  filter(arena == "horizontal" & light_environment == "bright") %>%
+  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
+  geom_segment(aes(xend = wavelength, yend = 0, 
+                   colour = nm_to_RGB(wavelength))) +
+  geom_line() +
+  scale_colour_identity() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 7.5),
+                     expand = c(0, 0), # removes space between plotted data and y axis
+                     breaks = c(1, 2, 3, 4, 5, 6)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+
+horizontal_bright_spec
+
+vertical_bright_spec <- spec_data %>%
+  filter(arena == "vertical" & light_environment == "bright") %>%
+  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
+  geom_segment(aes(xend = wavelength, yend = 0, 
+                   colour = nm_to_RGB(wavelength))) +
+  geom_line() +
+  scale_colour_identity() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 7.5),
+                     expand = c(0, 0), # removes space between plotted data and y axis
+                     breaks = c(1, 2, 3, 4, 5, 6)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+
+vertical_bright_spec
+
+horizontal_dark_spec <- spec_data %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
+  geom_line() +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 0.065),
+                     expand = c(0, 0)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+ggplotly(horizontal_dark_spec)
+
+vertical_dark_spec <- spec_data %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
+  geom_segment(aes(xend = wavelength, yend = 0, 
+                   colour = nm_to_RGB(wavelength))) +
+  scale_colour_identity() +
+  geom_spline() +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 0.05),
+                     expand = c(0, 0)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+vertical_dark_spec
+
+ggplotly(vertical_dark_spec)
+
+```
+
 # Statistics
 
 ## qPCR
@@ -1929,7 +2119,7 @@ summary(res_qPCR_aov)
 ## Test for normality
 
 # Building the linear model
-edge_model <- lm(maximum_sharpness ~ probe, data = focal_data)
+edge_model <- lm(maximum_sharpness ~ probe, data = hang_data)
 
 # Creating a QQ plot of residuals
 ggqqplot(residuals(edge_model))
@@ -1939,17 +2129,17 @@ shapiro_test(residuals(edge_model))
 # p < 0.05 so not assuming normality
 
 # Checking normality assumption by groups
-focal_data %>%
+hang_data %>%
   group_by(probe) %>%
   shapiro_test(maximum_sharpness)
 # again p < 0.05 so not assuming normality
 
 # Creating QQ plots for each group level
-ggqqplot(focal_data, "maximum_sharpness", facet.by = "probe")
+ggqqplot(hang_data, "maximum_sharpness", facet.by = "probe")
 # Control and Probe 1 look normal. Probe 2 is kinda wonky. But will proceed with Gaussian stats
 
 # Using a Kruskal Wallis test
-res_edge_kw <- focal_data %>%
+res_edge_kw <- hang_data %>%
   group_by(eye) %>%
   kruskal_test(maximum_sharpness ~ probe)
 
@@ -1966,7 +2156,7 @@ res_edge_kw
 ## Test for normality
 
 # Building the linear model
-focal_model <- lm(peak_2_um ~ probe, data = focal_data)
+focal_model <- lm(peak_2_um ~ probe, data = hang_data)
 
 # Creating a QQ plot of residuals
 ggqqplot(residuals(focal_model))
@@ -1976,21 +2166,21 @@ shapiro_test(residuals(focal_model))
 # p > 0.05 so assuming normality
 
 # Checking normality assumption by groups
-focal_data %>%
+hang_data %>%
   group_by(probe) %>%
   shapiro_test(peak_2_um)
 # again p > 0.05 so assuming normality
 
 # Creating QQ plots for each group level
-ggqqplot(focal_data, "peak_2_um", facet.by = "probe")
+ggqqplot(hang_data, "peak_2_um", facet.by = "probe")
 # Control and Probe 1 look normal. Probe 2 is kinda wonky. But will proceed with Gaussian stats
 
 # Using an ANOVA test
-res_focal_aov <- compare_means(peak_2_um ~ probe, data = focal_data, 
+res_focal_aov <- compare_means(peak_2_um ~ probe, data = hang_data, 
               group.by = "eye", method = 'anova')
 res_focal_aov
 
-res_focal_aov <- focal_data %>%
+res_focal_aov <- hang_data %>%
   group_by(eye) %>%
   anova_test(peak_2_um ~ probe)
 
