@@ -753,6 +753,196 @@ dev.off()
 
 ```
 
+```{r figure S1: hanging drops}
+
+###### edge sharpness curves - row 1 ######
+fig.a <- LE1_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+# adding a second x axis label
+fig.a <- ggdraw(fig.a) + 
+  draw_label("Left eye 1",
+             size = 20,
+             y = 0.05, # y coordinates
+             x = 0.55) 
+  
+fig.a
+
+fig.b <- RE1_edge_plot +
+ theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm"))
+
+# adding a second x axis label
+fig.b <- ggdraw(fig.b) + 
+  draw_label("Right eye 1",
+             size = 20,
+             y = 0.05, # y coordinates
+             x = 0.55) 
+  
+fig.b
+
+fig.c <- RE2_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm"))
+  
+# adding a second x axis label
+fig.c <- ggdraw(fig.c) + 
+  draw_label("Right eye 2",
+             size = 20,
+             y = 0.05, # y coordinates
+             x = 0.55) 
+
+fig.c
+
+# Creating common axis labels
+y.grob <- textGrob("Relative edge sharpness", 
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25), rot = 90,
+                             vjust = 0.8,
+                             hjust = 0.4)
+
+x.grob <- textGrob("Distance from back surface of lens (µm)",
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25))
+
+# extract legend from one figure
+legend <- get_legend(LE1_edge_plot + 
+                       theme(legend.position = "bottom")) # legend is laid out horizontally
+
+# Use cowplot package to nicely plot the graphs together
+edge_supplement_plot_trim <- plot_grid(fig.a, fig.b, fig.c,
+                   #list of plots to arrange in grid
+                   labels = c("A","B","C"), # panel labels for figure
+                   label_size = 23,
+                   hjust = 0.3, # adjustment for panel labels
+                   vjust = 0.9,
+                   align = "v",
+                   nrow = 1) +
+  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+plot_grid(edge_supplement_plot_trim)
+
+edge_supplement_xlab_trim <- plot_grid(edge_supplement_plot_trim, x.grob,
+                                 ncol = 1, rel_heights = c(1, .1))
+plot_grid(edge_supplement_xlab_trim)
+
+edge_supplement_final <- grid.arrange(arrangeGrob(edge_supplement_xlab_trim, 
+                         left = y.grob,
+                         bottom = legend))
+
+###### maximum edge sharpness boxplots - row 2 ######
+fig.d <- LE1_max_edge +
+  theme(axis.title.y = element_blank(),
+        axis.title.x = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+  
+fig.d
+
+fig.e <- RE1_max_edge +
+  theme(axis.title.y = element_blank(),
+        axis.title.x = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"))
+  
+fig.e
+
+fig.f <- RE2_max_edge +
+  theme(axis.title.y = element_blank(),
+        axis.title.x = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"))
+  
+fig.f
+
+# Creating common axis labels
+y.grob <- textGrob("Maximum edge sharpness", 
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25), rot = 90,
+                             vjust = 0.6,
+                             hjust = 0.5)
+
+# Use cowplot package to nicely plot the graphs together 
+max_sharpness_plot_trim <- plot_grid(fig.d, fig.e, fig.f,
+                   #list of plots to arrange in grid
+                   align = "h",
+                   labels = c("D","E","F"), # panel labels for figure
+                   label_size = 23,
+                   hjust = 0.3, # adjustment for panel labels
+                   vjust = 0.9,
+                   nrow = 1) +
+  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+plot_grid(max_sharpness_plot_trim)
+
+max_sharpness_final <- grid.arrange(arrangeGrob(max_sharpness_plot_trim, left = y.grob))
+
+####### back focal length boxplots - row 3
+fig.g <- LE1_focal +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+  
+fig.g
+
+fig.h <- RE1_focal +
+  theme(axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+  
+fig.h
+
+fig.i <- RE2_focal +
+  theme(axis.title.y = element_blank()) + 
+   theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"))
+  
+fig.i
+
+# Creating common axis labels
+y.grob <- textGrob("Back focal length (µm)", 
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25), rot = 90, 
+                             vjust = 0.6,
+                             hjust = 0.5)
+
+# Use cowplot package to nicely plot the graphs together 
+focal_supplement_plot_trim <- plot_grid(fig.g, fig.h, fig.i,
+                   #list of plots to arrange in grid
+                   rel_widths = c(6, 6),
+                   labels = c("G","H","I"), # panel labels for figure
+                   label_size = 23,
+                   hjust = 0.3, # adjustment for panel labels
+                   vjust = 0.9,
+                   nrow = 1) +
+  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+plot_grid(focal_supplement_plot_trim)
+
+focal_supplement_final <- grid.arrange(arrangeGrob(focal_supplement_plot_trim, left = y.grob))
+
+###### assembling final figure ######
+final.supplement <- plot_grid(edge_supplement_final,
+                              max_sharpness_final,
+                              focal_supplement_final,
+                     rel_heights = c(1.2, 1, 1),
+                     nrow = 3)
+final.supplement
+
+# writing to pdf
+pdf(file = "Figures/hanging_drops_supplement.pdf", width = 19,  height = 14)
+final.supplement
+dev.off()
+
+```
+
 ## Ophthalmoscope
 
 ```{r individual eye boxplots}
@@ -981,7 +1171,7 @@ long_plot <- plot_grid(fig.a, fig.b,
                        align = 'v', 
                        axis = 'r',
                        nrow = 2,
-                       rel_heights = c(6.5, 6))
+                       rel_heights = c(7, 6))
 plot_grid(long_plot)
 
 # Creating common y axis label
@@ -2335,6 +2525,116 @@ res_latency_light_hor_kw
 # No significant changes in back focal length with lens3 knockdown - all eyes
 ```
 
+### Latency pooled probes
+
+```{r normal light behaviour latency stats pooled probes}
+
+## Horizontal
+# Building the linear model
+pooled_latency_model_hor_light <- lm(latency_min ~ group, 
+                                    data = behaviour_data, 
+                                    subset = (light_environment == 'normal' & arena == 'horizontal'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(pooled_latency_model_hor_light))
+
+# Test for normality
+shapiro_test(residuals(pooled_latency_model_hor_light))
+# p < 0.05 so can't assume normality
+
+# Checking normality assumption by groups
+behaviour_data %>%
+  filter(light_environment == 'normal' & arena == 'horizontal') %>%
+  group_by(group) %>%
+  shapiro_test(latency_min)
+# both groups not normal
+
+## Vertical
+# Building the linear model
+pooled_latency_model_ver_light <- lm(latency_min ~ group, 
+                                    data = behaviour_data, 
+                                    subset = (light_environment == 'normal' & arena == 'vertical'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(pooled_latency_model_ver_light))
+
+# Test for normality
+shapiro_test(residuals(pooled_latency_model_ver_light))
+# p > 0.05 so can't assume normality
+
+# Checking normality assumption by groups
+behaviour_data %>%
+  filter(light_environment == 'normal' & arena == 'vertical') %>%
+  group_by(group) %>%
+  shapiro_test(latency_min)
+# both groups not normal
+
+## non-parametric
+# horizontal test
+res_latency_light_horizontal_pooled_wil <- behaviour_data %>%
+  filter(light_environment == 'normal', arena == 'horizontal') %>%
+  wilcox_test(latency_min ~ group)
+
+res_latency_light_horizontal_pooled_wil
+# not significant
+
+# vertical test
+res_latency_light_vertical_pooled_wil <- behaviour_data %>%
+  filter(light_environment == 'normal', arena == 'vertical') %>%
+  wilcox_test(latency_min ~ group)
+
+res_latency_light_vertical_pooled_wil
+# not significant
+
+```
+
+### Hunting success pooled probes
+
+```{r dark behaviour hunting success pooled probes}
+
+## Horizontal
+# Building the linear model
+pooled_hunting_model_hor_light <- lm(hunting_success ~ group, 
+                                    data = behaviour_data, 
+                                    subset = (light_environment == 'normal' & arena == 'horizontal'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(pooled_hunting_model_hor_light))
+
+# Test for normality
+shapiro_test(residuals(pooled_hunting_model_hor_light))
+# p < 0.05 so can't assume normality - as expected 
+
+## Vertical
+# Building the linear model
+pooled_hunting_model_ver_light <- lm(hunting_success ~ group, 
+                                    data = behaviour_data, 
+                                    subset = (light_environment == 'normal' & arena == 'vertical'))
+
+# Creating a QQ plot of residuals
+ggqqplot(residuals(pooled_hunting_model_ver_light))
+
+# Test for normality
+shapiro_test(residuals(pooled_hunting_model_ver_light))
+# p > 0.05 so can't assume normality - as expected 
+
+# horizontal test
+res_hunting_light_horizontal_pooled_wil <- behaviour_data %>%
+  filter(light_environment == 'normal', arena == 'horizontal') %>%
+  wilcox_test(hunting_success ~ group)
+
+res_hunting_light_horizontal_pooled_wil
+# not significant
+
+# vertical test
+res_hunting_light_vertical_pooled_wil <- behaviour_data %>%
+  filter(light_environment == 'normal', arena == 'vertical') %>%
+  wilcox_test(hunting_success ~ group)
+
+res_hunting_light_vertical_pooled_wil
+# not significant
+```
+
 ## Dark conditions
 ### Latency separate probes
 
@@ -2384,12 +2684,6 @@ var_latency_dark <- behaviour_data %>%
 
 var_latency_dark
 # Variances are not significantly different across groups
-
-# Using an ANOVA test
-res_latency_dark <- compare_means(latency_min ~ probe, data = behaviour_data, 
-                                          subset = (light_environment == 'dark'), 
-                                          group.by = "arena", method = 'anova')
-res_latency_dark
 
 # Using a different ANOVA function
 res_latency_dark_horizontal <- behaviour_data %>%
@@ -2467,22 +2761,6 @@ res_latency_dark_vertical_pooled_wil <- behaviour_data %>%
 res_latency_dark_vertical_pooled_wil
 # significant!!
 
-## parametric
-# horizontal test
-res_latency_dark_horizontal_pooled_t <- behaviour_data %>%
-  filter(light_environment == 'dark', arena == 'horizontal') %>%
-  t_test(latency_min ~ group)
-
-res_latency_dark_horizontal_pooled_t
-# significant!!
-
-# vertical test
-res_latency_dark_vertical_pooled_t <- behaviour_data %>%
-  filter(light_environment == 'dark', arena == 'vertical') %>%
-  t_test(latency_min ~ group)
-
-res_latency_dark_vertical_pooled_t
-# significant!!
 ```
 
 ### Hunting success pooled probes
@@ -2531,4 +2809,5 @@ res_hunting_dark_vertical_pooled_wil <- behaviour_data %>%
 
 res_hunting_dark_vertical_pooled_wil
 # not significant
+
 ```
