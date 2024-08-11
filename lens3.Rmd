@@ -392,7 +392,7 @@ RE2_max_edge
 # scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
 ```
 
-```{r figure S1: edge sharpness curves}
+```{r edge sharpness curves figure}
 
 fig.a <- LE1_edge_plot +
   theme(axis.title.x = element_blank(),
@@ -497,7 +497,7 @@ dev.off()
 
 ```
 
-```{r figure S2: maximum edge sharpness boxplots}
+```{r maximum edge sharpness boxplots figure}
 
 fig.a <- LE1_max_edge +
   theme(axis.title.y = element_blank()) + 
@@ -645,7 +645,7 @@ RE2_focal
 # scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
 ```
 
-```{r figure S3: back focal length boxplots}
+```{r back focal length boxplot figure}
 
 fig.a <- LE1_focal +
   theme(axis.title.y = element_blank()) + 
@@ -1398,7 +1398,7 @@ E2_LR_249_oph_plot
 
 ```
 
-```{r figure S4: ophthalmoscope left right asymmetry}
+```{r figure S2: ophthalmoscope left right asymmetry}
 
 # Making panels
 fig.a <- E1_LR_control_oph_plot
@@ -2265,7 +2265,10 @@ nm_to_RGB <- function(wavelengths){
 spec_data <- spec_data %>%
   mutate(across(c("absolute_irradiance"), abs))
 
-horizontal_bright_spec <- spec_data %>%
+### with colour gradient
+## bright
+# horizontal 
+horizontal_bright_spec_colour <- spec_data %>%
   filter(arena == "horizontal" & light_environment == "bright") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
   geom_segment(aes(xend = wavelength, yend = 0, 
@@ -2284,9 +2287,10 @@ horizontal_bright_spec <- spec_data %>%
         axis.text = element_text(size = 17),
                                  legend.position = "none")
 
-horizontal_bright_spec
+horizontal_bright_spec_colour
 
-vertical_bright_spec <- spec_data %>%
+# vertical
+vertical_bright_spec_colour <- spec_data %>%
   filter(arena == "vertical" & light_environment == "bright") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
   geom_segment(aes(xend = wavelength, yend = 0, 
@@ -2305,9 +2309,11 @@ vertical_bright_spec <- spec_data %>%
         axis.text = element_text(size = 17),
                                  legend.position = "none")
 
-vertical_bright_spec
+vertical_bright_spec_colour
 
-horizontal_dark_spec <- spec_data %>%
+## dark
+# horizontal 
+horizontal_dark_spec_colour <- spec_data %>%
   filter(arena == "horizontal" & light_environment == "dark") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
   geom_spline() +
@@ -2320,9 +2326,10 @@ horizontal_dark_spec <- spec_data %>%
         axis.title.y = element_text(size = 20, vjust = 1.8),
         axis.text = element_text(size = 17),
                                  legend.position = "none")
-ggplotly(horizontal_dark_spec)
 
-vertical_dark_spec <- spec_data %>%
+## dark
+# vertical
+vertical_dark_spec_colour <- spec_data %>%
   filter(arena == "vertical" & light_environment == "dark") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
   geom_segment(aes(xend = wavelength, yend = 0, 
@@ -2338,9 +2345,169 @@ vertical_dark_spec <- spec_data %>%
         axis.title.y = element_text(size = 20, vjust = 1.8),
         axis.text = element_text(size = 17),
                                  legend.position = "none")
+vertical_dark_spec_colour
+
+### without colour gradient
+## bright
+# horizontal
+horizontal_bright_spec <- spec_data %>%
+  filter(arena == "horizontal" & light_environment == "bright") %>%
+  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
+  geom_spline() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 7.5),
+                     expand = c(0, 0), # removes space between plotted data and y axis
+                     breaks = c(1, 2, 3, 4, 5, 6, 7)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+
+horizontal_bright_spec
+
+# vertical
+vertical_bright_spec <- spec_data %>%
+  filter(arena == "vertical" & light_environment == "bright") %>%
+  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
+  geom_spline() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 7.5),
+                     expand = c(0, 0), # removes space between plotted data and y axis
+                     breaks = c(1, 2, 3, 4, 5, 6, 7)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+
+vertical_bright_spec
+
+## dark
+# horizontal 
+horizontal_dark_spec <- spec_data %>%
+  filter(arena == "horizontal" & light_environment == "dark") %>%
+  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
+  geom_spline() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 0.065),
+                     expand = c(0, 0)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+horizontal_dark_spec
+
+## dark
+# vertical
+vertical_dark_spec <- spec_data %>%
+  filter(arena == "vertical" & light_environment == "dark") %>%
+  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
+  geom_spline() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 0.065),
+                     expand = c(0, 0)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
 vertical_dark_spec
 
-ggplotly(vertical_dark_spec)
+```
+
+```{r figure S3: spectra}
+
+# Making panels
+fig.a <- horizontal_bright_spec +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+
+fig.b <- vertical_bright_spec +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+
+fig.c <- horizontal_dark_spec +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+
+fig.d <- vertical_dark_spec +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+
+
+figz <- LE1_edge_plot +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) + 
+  theme(legend.position = "none",
+        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+# Building the figure
+spec_figure <- plot_grid(fig.a, fig.b, fig.c, fig.d,
+           align = 'vh', # align horizontally and vertically
+           axis = 'lb',
+           labels = c("A","B","C","D"), # panel labels for figure
+           label_size = 28,
+           hjust = -.01, # adjustment for panel labels
+           vjust = -0.03,
+           nrow = 2) + # number of rows in grids
+           theme(plot.margin = unit(c(40, 40, 25, 25), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+  
+spec_figure
+
+# Creating common axis labels
+y.grob <- textGrob(label= expression(bold("Absolute spectral irradiance (µW/cm"^2*"/nm)")), 
+                   gp = gpar(fontsize = 25), rot = 90, 
+                             vjust = 0.8,
+                             hjust = 0.5)
+
+x.grob <- textGrob("Wavelength (nm)",
+                   gp = gpar(fontface = "bold",
+                             fontsize = 25),
+                             vjust = -0.3)
+
+
+# adding common x axis label
+spec_figure_xlab <- plot_grid(spec_figure, x.grob,
+                                 ncol = 1, rel_heights = c(1, 0.03))
+plot_grid(spec_figure_xlab)
+
+# adding common y axis label
+spec_figure_labs <- plot_grid(y.grob, spec_figure_xlab,
+                                 ncol = 2, rel_widths = c(0.03, 1))
+
+spec_figure_margins <- plot_grid(spec_figure_labs) +
+                       theme(plot.margin = unit(c(20, 20, 0, 0), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
+
+# rotating the horizontal larva icon by 90°
+larva_icon_magick <- image_read('larva_horizontal.png') # loading .png as a magick object for rotation
+larva_h_icon_rotate <- image_rotate(larva_icon_magick, 270) 
+
+# drawing icons onto the plot
+spec_figure_final<- ggdraw() +
+  draw_plot(spec_figure_margins) +
+    # bright & dim light vectors
+    draw_image(image = bright_icon, x = 0.47, y =  0.26, scale = 0.083) +
+    draw_image(image = dim_icon, x = 0.47, y =  -0.2, scale = 0.065) +
+    # horizontal larva silhouettes
+    draw_image(image = larva_h_icon_rotate, x = -0.19, y =  0.45, scale = 0.13) +
+    draw_image(image = larva_v_icon, x = 0.25, y =  0.441, scale = 0.13)
+
+spec_figure_final
+
+# Print graph
+cairo_pdf(file = "Figures/behaviour_spectra_supplement.pdf", width = 18,  height = 12) # cairo_pdf is able to handle special characters\
+spec_figure_final
+dev.off()
 
 ```
 
