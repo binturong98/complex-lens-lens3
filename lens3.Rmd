@@ -2273,7 +2273,7 @@ horizontal_bright_spec_colour <- spec_data %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
   geom_segment(aes(xend = wavelength, yend = 0, 
                    colour = nm_to_RGB(wavelength))) +
-  geom_spline() +
+  geom_line() +
   scale_colour_identity() +
   xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
   scale_x_continuous(limits = c(300, 750), 
@@ -2295,7 +2295,7 @@ vertical_bright_spec_colour <- spec_data %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
   geom_segment(aes(xend = wavelength, yend = 0, 
                    colour = nm_to_RGB(wavelength))) +
-  geom_line() +
+  geom_spline() +
   scale_colour_identity() +
   xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
   scale_x_continuous(limits = c(300, 750), 
@@ -2326,6 +2326,8 @@ horizontal_dark_spec_colour <- spec_data %>%
         axis.title.y = element_text(size = 20, vjust = 1.8),
         axis.text = element_text(size = 17),
                                  legend.position = "none")
+
+
 
 ## dark
 # vertical
@@ -2422,6 +2424,15 @@ vertical_dark_spec <- spec_data %>%
         axis.text = element_text(size = 17),
                                  legend.position = "none")
 vertical_dark_spec
+
+
+# find coordinates of spline ## That's the way to do this
+# other smoothers - LOESS - outside of ggplot
+# fill polygon is underneath line 
+# as the to plot layer overplot a white polygon that goes over the top 
+# 
+
+
 
 ```
 
