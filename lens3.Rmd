@@ -2265,10 +2265,9 @@ nm_to_RGB <- function(wavelengths){
 spec_data <- spec_data %>%
   mutate(across(c("absolute_irradiance"), abs))
 
-### with colour gradient
 ## bright
 # horizontal 
-horizontal_bright_spec_colour <- spec_data %>%
+horizontal_bright_spec_colour_unsmooth <- spec_data %>%
   filter(arena == "horizontal" & light_environment == "bright") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
   geom_segment(aes(xend = wavelength, yend = 0, 
@@ -2287,71 +2286,12 @@ horizontal_bright_spec_colour <- spec_data %>%
         axis.text = element_text(size = 17),
                                  legend.position = "none")
 
-horizontal_bright_spec_colour
+horizontal_bright_spec_colour_unsmooth
 
-# vertical
-vertical_bright_spec_colour <- spec_data %>%
-  filter(arena == "vertical" & light_environment == "bright") %>%
-  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
-  geom_segment(aes(xend = wavelength, yend = 0, 
-                   colour = nm_to_RGB(wavelength))) +
-  geom_spline() +
-  scale_colour_identity() +
-  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
-  scale_x_continuous(limits = c(300, 750), 
-                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
-  scale_y_continuous(limits = c(0, 7.5),
-                     expand = c(0, 0), # removes space between plotted data and y axis
-                     breaks = c(1, 2, 3, 4, 5, 6)) +
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
-        axis.title.y = element_text(size = 20, vjust = 1.8),
-        axis.text = element_text(size = 17),
-                                 legend.position = "none")
+# The only issue here is that the colour gradient is plotted using geom_segment which uses exact values. This is not an issue with geom_line which also plots exact values. But the problem arises with the dark spectra where the resolution of the spec is so low that the data looks choppy and disgusting with geom_line. Here a smoothed line is needed which geom_spline is perfect for. However, geom_spline then doesn't match with geom_segment and makes a giant mess. A fix, albeit very hacky and unelegant, is to extract the fit values from the spline and plot them separately so the geom_segment matches:
 
-vertical_bright_spec_colour
-
-## dark
-# horizontal 
-horizontal_dark_spec_colour <- spec_data %>%
-  filter(arena == "horizontal" & light_environment == "dark") %>%
-  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
-  geom_spline() +
-  scale_x_continuous(limits = c(300, 750), 
-                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
-  scale_y_continuous(limits = c(0, 0.065),
-                     expand = c(0, 0)) +
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
-        axis.title.y = element_text(size = 20, vjust = 1.8),
-        axis.text = element_text(size = 17),
-                                 legend.position = "none")
-
-
-
-## dark
-# vertical
-vertical_dark_spec_colour <- spec_data %>%
-  filter(arena == "vertical" & light_environment == "dark") %>%
-  ggplot(aes(x = wavelength, y = absolute_irradiance)) +
-  geom_segment(aes(xend = wavelength, yend = 0, 
-                   colour = nm_to_RGB(wavelength))) +
-  scale_colour_identity() +
-  geom_spline() +
-  scale_x_continuous(limits = c(300, 750), 
-                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
-  scale_y_continuous(limits = c(0, 0.05),
-                     expand = c(0, 0)) +
-  theme_classic() +
-  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
-        axis.title.y = element_text(size = 20, vjust = 1.8),
-        axis.text = element_text(size = 17),
-                                 legend.position = "none")
-vertical_dark_spec_colour
-
-### without colour gradient
-## bright
 # horizontal
+# no gradient
 horizontal_bright_spec <- spec_data %>%
   filter(arena == "horizontal" & light_environment == "bright") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
@@ -2370,7 +2310,31 @@ horizontal_bright_spec <- spec_data %>%
 
 horizontal_bright_spec
 
+# gradient
+hor_bright_spec_df<- ggplot_build(horizontal_bright_spec)$data[[1]] # extracting the spline values from the plot into a new dataframe
+
+horizontal_bright_spec_colour <- hor_bright_spec_df %>% # plotting extracted values
+  ggplot(aes(x = x, y = y)) +
+  geom_segment(aes(xend = x, yend = 0, 
+                   colour = nm_to_RGB(x))) +
+  geom_line() +
+  scale_colour_identity() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 7.5),
+                     expand = c(0, 0), # removes space between plotted data and y axis
+                     breaks = c(1, 2, 3, 4, 5, 6, 7)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+
+horizontal_bright_spec_colour
+
 # vertical
+# no gradient
 vertical_bright_spec <- spec_data %>%
   filter(arena == "vertical" & light_environment == "bright") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
@@ -2389,13 +2353,36 @@ vertical_bright_spec <- spec_data %>%
 
 vertical_bright_spec
 
+# gradient
+ver_bright_spec_df<- ggplot_build(vertical_bright_spec)$data[[1]] # extracting the spline values from the plot into a new dataframe
+
+vertical_bright_spec_colour <- ver_bright_spec_df %>% # plotting extracted values
+  ggplot(aes(x = x, y = y)) +
+  geom_segment(aes(xend = x, yend = 0, 
+                   colour = nm_to_RGB(x))) +
+  geom_line() +
+  scale_colour_identity() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 7.5),
+                     expand = c(0, 0), # removes space between plotted data and y axis
+                     breaks = c(1, 2, 3, 4, 5, 6, 7)) +
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+
+vertical_bright_spec_colour
+
 ## dark
 # horizontal 
+# no gradient
 horizontal_dark_spec <- spec_data %>%
   filter(arena == "horizontal" & light_environment == "dark") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
   geom_spline() +
-  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
   scale_x_continuous(limits = c(300, 750), 
                      breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
   scale_y_continuous(limits = c(0, 0.065),
@@ -2407,8 +2394,30 @@ horizontal_dark_spec <- spec_data %>%
                                  legend.position = "none")
 horizontal_dark_spec
 
-## dark
+# gradient
+hor_dark_spec_df<- ggplot_build(horizontal_dark_spec)$data[[1]] # extracting the spline values from the plot into a new dataframe
+
+horizontal_dark_spec_colour <- hor_dark_spec_df %>% # plotting extracted values
+  ggplot(aes(x = x, y = y)) +
+  geom_segment(aes(xend = x, yend = 0, 
+                   colour = nm_to_RGB(x))) +
+  geom_line() +
+  scale_colour_identity() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 0.065),
+                     expand = c(0, 0)) + # removes space between plotted data and y axis
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
+
+horizontal_dark_spec_colour
+
 # vertical
+# no gradient
 vertical_dark_spec <- spec_data %>%
   filter(arena == "vertical" & light_environment == "dark") %>%
   ggplot(aes(x = wavelength, y = absolute_irradiance)) +
@@ -2425,42 +2434,48 @@ vertical_dark_spec <- spec_data %>%
                                  legend.position = "none")
 vertical_dark_spec
 
+# gradient
+ver_dark_spec_df<- ggplot_build(vertical_dark_spec)$data[[1]] # extracting the spline values from the plot into a new dataframe
 
-# find coordinates of spline ## That's the way to do this
-# other smoothers - LOESS - outside of ggplot
-# fill polygon is underneath line 
-# as the to plot layer overplot a white polygon that goes over the top 
-# 
+vertical_dark_spec_colour <- ver_dark_spec_df %>% # plotting extracted values
+  ggplot(aes(x = x, y = y)) +
+  geom_segment(aes(xend = x, yend = 0, 
+                   colour = nm_to_RGB(x))) +
+  geom_line() +
+  scale_colour_identity() +
+  xlab("Wavelength (nm)") + ylab(label= expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")) +
+  scale_x_continuous(limits = c(300, 750), 
+                     breaks = c(350, 400, 450, 500, 550, 600, 650, 700)) +
+  scale_y_continuous(limits = c(0, 0.065),
+                     expand = c(0, 0)) + # removes space between plotted data and y axis
+  theme_classic() +
+  theme(axis.title.x = element_text(size = 20, vjust = -0.15),
+        axis.title.y = element_text(size = 20, vjust = 1.8),
+        axis.text = element_text(size = 17),
+                                 legend.position = "none")
 
-
+vertical_dark_spec_colour
 
 ```
 
 ```{r figure S3: spectra}
 
 # Making panels
-fig.a <- horizontal_bright_spec +
+fig.a <- horizontal_bright_spec_colour +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank())
 
-fig.b <- vertical_bright_spec +
+fig.b <- vertical_bright_spec_colour +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank())
 
-fig.c <- horizontal_dark_spec +
+fig.c <- horizontal_dark_spec_colour +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank())
 
-fig.d <- vertical_dark_spec +
+fig.d <- vertical_dark_spec_colour +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank())
-
-
-figz <- LE1_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
 
 # Building the figure
 spec_figure <- plot_grid(fig.a, fig.b, fig.c, fig.d,
