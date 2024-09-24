@@ -42,8 +42,6 @@ Raw data files for the ophthalmoscope, edge sharpness and focal length contain o
 
 Raw data file for behaviour contains data from both the optimal and dim light/challenging light arenas.
 
-Not using lens3_hanging_drops.csv as this was the first set of data that were collected. The images are overexposed and positioning isnt' quite right. This makes focal length estimation unreliable.
-
 ```{r loading data}
 
 # Load raw data
@@ -52,9 +50,8 @@ Not using lens3_hanging_drops.csv as this was the first set of data that were co
 qpcr_data <- read.csv("lens3_qPCR.csv", header = TRUE)
 
 # Hanging drops
-edge_data <- read.csv("lens3_edge_sharpness_long.csv", header = TRUE)
-
-hang_data <- read.csv("lens3_hanging_drops.csv", header = TRUE)
+edge_data <- read.csv("lens3_edge_sharpness_long.csv", header = TRUE) # raw edge sharpness values
+hang_data <- read.csv("lens3_hanging_drops.csv", header = TRUE) # peaks and maximum sharpness values extracted from raw edge sharpness data ^
 
 # Ophthalmoscope
 oph_data <- read.csv("lens3_ophthalmoscope.csv", header = TRUE)
@@ -71,16 +68,13 @@ spec_data <- read.csv("behaviour_arena_spec.csv", header = TRUE)
 palette.colors(palette = "Okabe-Ito")
 ```
 
-# Figures
-For the code below to work, create a folder called "Figures" in the same place as the RProject and RMarkdown file
-
 ## qPCR
 
 Comparing lens3 expression using qPCR on whole-head cDNA.
 
 ```{r qPCR plot}
 
-# ATM & STR generated data only
+# ATM generated data & STR analysed
 
 # Boxplot of log fold gene expression
 qPCR_plot <- qpcr_data %>%
@@ -104,7 +98,7 @@ qPCR_plot <- qpcr_data %>%
 qPCR_plot
 ```
 
-```{r figure 2B: qPCR }
+```{r figure 2: qPCR }
 
 pdf(file = "Figures/qPCR.pdf", width = 9,  height = 6)
 qPCR_plot
@@ -270,29 +264,9 @@ individual_edge_plot <- edge_data %>%
         legend.text = element_text(size = 15))
 ggplotly(individual_edge_plot) 
 
-# Unused but useful bit of code:
-# Melting the data by distance to make it long format:
-# edge_data <- melt(edge_data, id.vars = "distance", value.name = "contrast")
-
-# Pulling information from rows and trying to organise it into a new column:
-# edge_data_long$left <- str_detect(edge_data_long$variable, "L") 
 ```
 
 Comparing maximum edge sharpness values between controls and tests. This usually corresponds to the second peak/image. However, sometimes the first peak has higher edge sharpness. This happens more often in knockdowns; That's some of the eyes of some individuals (3/10) for Probe 1 and for Probe 2 (4/10) and just right eyes in one control individual. In some eyes of Probe 2 individuals (2/10; 249.13 - LE2, 249.17 - LE1, RE1), best focused images could not be detected in the edge sharpness plots or manually
-
-Control
-C12 - RE1, RE2
-
-Probe 1
-191.20 - RE1
-191.22 - LE1, RE1, RE2
-191.23 - LE1
-
-Probe 2
-249.9 - LE1, LE2
-249.13 - LE1
-249.15 - LE2
-249.18 - RE2
 
 ```{r maximum edge sharpness boxplots}
 
@@ -388,176 +362,10 @@ RE2_max_edge <- hang_data %>%
                                  legend.position = "none")
 RE2_max_edge
 
-# scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-# scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
-```
-
-```{r edge sharpness curves figure}
-
-fig.a <- LE1_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
-
-# adding a second x axis label
-fig.a <- ggdraw(fig.a) + 
-  draw_label("Left eye 1",
-             size = 20,
-             y = 0.05, # y coordinates
-             x = 0.55) 
-  
-fig.a
-
-fig.b <- RE1_edge_plot +
- theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm"))
-
-# adding a second x axis label
-fig.b <- ggdraw(fig.b) + 
-  draw_label("Right eye 1",
-             size = 20,
-             y = 0.05, # y coordinates
-             x = 0.55) 
-  
-fig.b
-
-fig.c <- LE2_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.text = element_text(size = 20),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm"))
-  
-# adding a second x axis label
-fig.c <- ggdraw(fig.c) + 
-  draw_label("Left eye 2",
-             size = 20,
-             y = 0.05, # y coordinates
-             x = 0.55) 
-
-fig.c
-
-fig.d <- RE2_edge_plot +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.9, 0.7), "cm"))
-  
-# adding a second x axis label
-fig.d <- ggdraw(fig.d) + 
-  draw_label("Right eye 2",
-             size = 20,
-             y = 0.05, # y coordinates
-             x = 0.55) 
-
-fig.d
-
-# Creating common axis labels
-y.grob <- textGrob("Relative edge sharpness", 
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90,
-                             vjust = 0.8,
-                             hjust = 0.4)
-
-x.grob <- textGrob("Distance from back surface of lens (µm)",
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25))
-
-# extract legend from one figure
-legend <- get_legend(LE1_edge_plot + 
-                       theme(legend.position = "bottom")) # legend is laid out horizontally
-
-# Use cowplot package to nicely plot the graphs together
-edge_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
-                   #list of plots to arrange in grid
-                   rel_widths = c(6, 6),
-                   labels = c("A","B","C","D"), # panel labels for figure
-                   label_size = 23,
-                   hjust = 0.3, # adjustment for panel labels
-                   vjust = 0.9,
-                   align = "v",
-                   nrow = 2) +
-  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
-
-plot_grid(edge_supplement_plot)
-
-edge_supplement_xlab <- plot_grid(edge_supplement_plot, x.grob,
-                                 ncol = 1, rel_heights = c(1, .1))
-plot_grid(edge_supplement_xlab)
-
-# Print graph
-cairo_pdf(file = "Figures/edge_curve_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
-grid.arrange(arrangeGrob(edge_supplement_xlab, 
-                         left = y.grob,
-                         bottom = legend))
-dev.off()
-
-```
-
-```{r maximum edge sharpness boxplots figure}
-
-fig.a <- LE1_max_edge +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
-  
-fig.a
-
-fig.b <- RE1_max_edge +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"))
-  
-fig.b
-
-fig.c <- LE2_max_edge +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"),
-        axis.text = element_text(size = 17))
-  
-fig.c
-
-fig.d <- RE2_max_edge +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"))
-  
-fig.d
-
-# Creating common axis labels
-y.grob <- textGrob("Maximum relative edge sharpness", 
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90,
-                             vjust = 0.6,
-                             hjust = 0.5)
-
-# Use cowplot package to nicely plot the graphs together 
-max_sharpness_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
-                   #list of plots to arrange in grid
-                   rel_widths = c(6, 6),
-                   align = "v",
-                   labels = c("A","B","C","D"), # panel labels for figure
-                   label_size = 23,
-                   hjust = 0.3, # adjustment for panel labels
-                   vjust = 0.9,
-                   nrow = 2) +
-  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
-
-plot_grid(max_sharpness_plot)
-
-# Print graph
-cairo_pdf(file = "Figures/max_sharpness_supplement.pdf", width = 12,  height = 8) # cairo_pdf is able to handle special characters
-grid.arrange(arrangeGrob(max_sharpness_plot, left = y.grob))
-dev.off()
-
 ```
 
 ## Back focal length
-Only using the 2nd (typically taller) peak for this because the 1st is often hard to detect. Went through the image series side-by-side to verify these. 
+Using the 2nd (typically taller) peak. Verified through visual assessment of the image series.
 
 ```{r back focal length boxplots}
 
@@ -641,69 +449,9 @@ RE2_focal <- hang_data %>%
                                  legend.position = "none")
 RE2_focal
 
-# scale_x_discrete(labels = c('Control', 'Probe 1', 'Probe 2')) +
-# scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2)) +
 ```
 
-```{r back focal length boxplot figure}
-
-fig.a <- LE1_focal +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
-  
-fig.a
-
-fig.b <- RE1_focal +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm")) #The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
-  
-fig.b
-
-fig.c <- LE2_focal +
-  theme(axis.title.y = element_blank()) + 
-  theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"),
-        axis.title.x = element_text(size = 20, face = "plain"),
-        axis.text = element_text(size = 17))
-  
-fig.c
-
-fig.d <- RE2_focal +
-  theme(axis.title.y = element_blank()) + 
-   theme(legend.position = "none",
-        plot.margin = unit(c(0.5, 0, 0.5, 0.7), "cm"))
-  
-fig.d
-
-# Creating common axis labels
-y.grob <- textGrob("Back focal length (µm)", 
-                   gp = gpar(fontface = "bold",
-                             fontsize = 25), rot = 90, 
-                             vjust = 0.6,
-                             hjust = 0.5)
-
-# Use cowplot package to nicely plot the graphs together 
-focal_supplement_plot <- plot_grid(fig.a, fig.b, fig.c, fig.d,
-                   #list of plots to arrange in grid
-                   rel_widths = c(6, 6),
-                   labels = c("A","B","C","D"), # panel labels for figure
-                   label_size = 23,
-                   hjust = 0.3, # adjustment for panel labels
-                   vjust = 0.9,
-                   nrow = 2) +
-  theme(plot.margin = unit(c(20, 20, 5, 20), "points")) # The order of edges for plot.margin is unit(c(top, right, bottom, left), units)
-
-plot_grid(focal_supplement_plot)
-
-# Print graph
-cairo_pdf(file = "Figures/focal_supplement_plot.pdf", width = 13,  height = 8) # cairo_pdf is able to handle special characters
-grid.arrange(arrangeGrob(focal_supplement_plot, left = y.grob))
-dev.off()
-```
-
-```{r figure 5: sharpness curve & maximum sharpness & focal length}
+```{r figure 3: sharpness curve & maximum sharpness & focal length}
 
 # making individual panels 
 fig.f <- plot_grid(LE2_edge_plot,
@@ -747,7 +495,7 @@ fig.fgh <- plot_grid(fig.f, fig.gh,
 fig.fgh
 
 # writing to pdf
-pdf(file = "Figures/LE2_hanging_drop.pdf", width = 20,  height = 10)
+pdf(file = "Figures/figure_3.pdf", width = 20,  height = 10)
 fig.fgh
 dev.off()
 
@@ -937,7 +685,7 @@ final.supplement <- plot_grid(edge_supplement_final,
 final.supplement
 
 # writing to pdf
-pdf(file = "Figures/hanging_drops_supplement.pdf", width = 19,  height = 14)
+pdf(file = "Figures/figure_S1.pdf", width = 19,  height = 14)
 final.supplement
 dev.off()
 
@@ -1180,7 +928,7 @@ y.grob <- textGrob("Object distance (mm)",
                              fontsize = 30), rot = 90)
 
 # Print graph
-cairo_pdf(file = "Figures/ophthalmoscope_long.pdf", width = 12,  height = 9) # cairo_pdf is able to handle special characters
+cairo_pdf(file = "Figures/figure_6.pdf", width = 12,  height = 9) # cairo_pdf is able to handle special characters
 grid.arrange(arrangeGrob(long_plot, left = y.grob)) #adding common y axis label to plot
 dev.off()
 ```
@@ -1258,10 +1006,6 @@ summary(LR_E2_191_mod)
 # adj r.r = 0.304
 summary(LR_E2_249_mod)
 # adj r.r = -0.101
-
-# visualising model residuals
-qqnorm(LR_E1_control_mod$residuals, pch = 1, frame = FALSE)
-qqline(LR_E1_control_mod$residuals, col = "steelblue", lwd = 2)
 ```
 
 ```{r left-right asymmetry plots}
@@ -1451,7 +1195,7 @@ legend_large <- get_legend(LE1_edge_plot +
               legend.text = element_text(size=18))) #change legend text font size) 
 
 # Print graph
-cairo_pdf(file = "Figures/LvR_asymmetry_supplement.pdf", width = 23,  height = 13) # cairo_pdf is able to handle special characters
+cairo_pdf(file = "Figures/figure_S2.pdf", width = 23,  height = 13) # cairo_pdf is able to handle special characters
 grid.arrange(arrangeGrob(LR_asymmetry_xlab,
                          left = y.grob,
                          bottom = legend_large)) # legend extracted from the edge supplement curves 
@@ -2216,7 +1960,7 @@ behaviour_final <- ggdraw() +
 behaviour_final
 
 # print graph
-pdf(file = "Figures/behaviour.pdf", width = 15,  height = 16)
+pdf(file = "Figures/figure_7.pdf", width = 15,  height = 16)
 behaviour_final
 dev.off()
 
@@ -2227,7 +1971,7 @@ dev.off()
 ```{r spec plots}
 
 # Defining nm_to_RGB. 
-# This is a function converts a wavelength of light into a hex-string to represent a colour
+# This is a function which converts a wavelength of light into a hex-string to represent a colour
 nm_to_RGB <- function(wavelengths){
   sapply(wavelengths, function(wavelength) {
   red <- green <- blue <- 0  
@@ -2288,7 +2032,7 @@ horizontal_bright_spec_colour_unsmooth <- spec_data %>%
 
 horizontal_bright_spec_colour_unsmooth
 
-# The only issue here is that the colour gradient is plotted using geom_segment which uses exact values. This is not an issue with geom_line which also plots exact values. But the problem arises with the dark spectra where the resolution of the spec is so low that the data looks choppy and disgusting with geom_line. Here a smoothed line is needed which geom_spline is perfect for. However, geom_spline then doesn't match with geom_segment and makes a giant mess. A fix, albeit very hacky and unelegant, is to extract the fit values from the spline and plot them separately so the geom_segment matches:
+# The only issue here is that the colour gradient is plotted using geom_segment which uses exact values. This is not an issue with geom_line which also plots exact values. But the problem arises with the dark spectra where the resolution of the spec is so low that the data looks choppy and disgusting with geom_line. Here a smoothed line is needed which geom_spline is perfect for. However, geom_spline then doesn't match with geom_segment and makes a giant mess. A fix, albeit quite hacky and unelegant, is to extract the fit values from the spline and plot them separately so the geom_segment matches:
 
 # horizontal
 # no gradient
@@ -2455,7 +2199,6 @@ vertical_dark_spec_colour <- ver_dark_spec_df %>% # plotting extracted values
                                  legend.position = "none")
 
 vertical_dark_spec_colour
-
 ```
 
 ```{r figure S3: spectra}
@@ -2531,7 +2274,7 @@ spec_figure_final<- ggdraw() +
 spec_figure_final
 
 # Print graph
-cairo_pdf(file = "Figures/behaviour_spectra_supplement.pdf", width = 18,  height = 12) # cairo_pdf is able to handle special characters\
+cairo_pdf(file = "Figures/figure_S3.pdf", width = 18,  height = 12) # cairo_pdf is able to handle special characters\
 spec_figure_final
 dev.off()
 
@@ -2684,43 +2427,9 @@ summary(res_oph_kw)
 ## Behaviour
 
 ## Normal light conditions
-### Latency separate probes
-
-```{r normal light latency separate probes}
-
-## Test for normality 
-
-# Building the linear model
-latency_model_hor_light <- lm(latency_min ~ probe, data = behaviour_data, subset = (light_environment == 'normal' & arena == 'horizontal'))
-
-# Creating a QQ plot of residuals
-ggqqplot(residuals(latency_model_hor_light))
-
-# Test for normality
-shapiro_test(residuals(latency_model_hor_light))
-# p < 0.05 so can't assume normality
-
-# Checking normality assumption by groups
-behaviour_data %>%
-  filter(light_environment == 'normal' & arena == 'horizontal') %>%
-  group_by(probe) %>%
-  shapiro_test(latency_min)
-# controls aren't normal but the other two are?
-
-# Creating QQ plots for each group level
-
-# Using an ANOVA test
-res_latency_light_hor_kw <- compare_means(latency_min ~ probe, data = behaviour_data, 
-                                          subset = (light_environment == 'normal'), 
-                                          group.by = "arena", method = 'kruskal.test')
-res_latency_light_hor_kw
-
-# No significant changes in back focal length with lens3 knockdown - all eyes
-```
-
 ### Latency pooled probes
 
-```{r normal light behaviour latency stats pooled probes}
+```{r normal light latency}
 
 ## Horizontal
 # Building the linear model
@@ -2783,7 +2492,7 @@ res_latency_light_vertical_pooled_wil
 
 ### Hunting success pooled probes
 
-```{r dark behaviour hunting success pooled probes}
+```{r normal light hunting success}
 
 ## Horizontal
 # Building the linear model
@@ -2829,73 +2538,9 @@ res_hunting_light_vertical_pooled_wil
 ```
 
 ## Dark conditions
-### Latency separate probes
-
-```{r dark behaviour latency stats separate probes}
-
-## Horizontal
-# Building the linear model
-latency_model_hor_dark <- lm(latency_min ~ probe, data = behaviour_data, subset = (light_environment == 'dark' & arena == 'horizontal'))
-
-# Creating a QQ plot of residuals
-ggqqplot(residuals(latency_model_hor_dark))
-
-# Test for normality
-shapiro_test(residuals(latency_model_hor_dark))
-# p > 0.05 so can assume normality
-
-# Checking normality assumption by groups
-behaviour_data %>%
-  filter(light_environment == 'dark' & arena == 'horizontal') %>%
-  group_by(probe) %>%
-  shapiro_test(latency_min)
-# Controls not normal but other probes 1 and 2 are?
-
-## Vertical
-# Building the linear model
-latency_model_ver_dark <- lm(latency_min ~ probe, data = behaviour_data, subset = (light_environment == 'dark' & arena == 'vertical'))
-
-# Creating a QQ plot of residuals
-ggqqplot(residuals(latency_model_ver_dark))
-
-# Test for normality
-shapiro_test(residuals(latency_model_ver_dark))
-# p > 0.05 so can assume normality
-
-# Checking normality assumption by groups
-behaviour_data %>%
-  filter(light_environment == 'dark' & arena == 'vertical') %>%
-  group_by(probe) %>%
-  shapiro_test(latency_min)
-# All normal
-
-# Checking for homogeneity of variance across groups with Levene's test
-var_latency_dark <- behaviour_data %>%
-  filter(light_environment == 'dark') %>%
-  group_by(arena) %>%
-  levene_test(latency_min ~ probe)
-
-var_latency_dark
-# Variances are not significantly different across groups
-
-# Using a different ANOVA function
-res_latency_dark_horizontal <- behaviour_data %>%
-  filter(light_environment == 'dark', arena == 'horizontal') %>%
-  anova_test(latency_min ~ probe)
-
-res_latency_dark_horizontal
-
-res_latency_dark_vertical <- behaviour_data %>%
-  filter(light_environment == 'dark', arena == 'vertical') %>%
-  anova_test(latency_min ~ probe)
-
-res_latency_dark_vertical
-# not significant
-```
-
 ### Latency pooled probes
 
-```{r dark behaviour latency stats pooled probes}
+```{r dark latency stats}
 
 ## Horizontal
 # Building the linear model
@@ -2957,8 +2602,7 @@ res_latency_dark_vertical_pooled_wil
 ```
 
 ### Hunting success pooled probes
-
-```{r dark behaviour hunting success pooled probes}
+```{r dark hunting success}
 
 ## Horizontal
 # Building the linear model
