@@ -1,1 +1,1 @@
-This is a private working repository of analyses for the T. marmoratus lens3 project. The publicly available repository attached to the publication is called "lens3".
+Analyses for Mitra A.T., Rathore S.T., Jester A, Hyland-Brown R., Hastert J., Benoit J.B., Stowasser A., Tomoyasu Y., Buschbeck E.K. Deconstructing a complex lens: functional implications of cataract induction in an arthropod visual system
