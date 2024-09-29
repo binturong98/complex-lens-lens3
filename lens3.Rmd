@@ -1,6 +1,6 @@
 ---
 title: "Deconstructing a complex Lens - functional implications of cataract induction in an insect visual system"
-authors: "Mitra AT., Rathore S., Jester A., Hyland-Brown R., Hassert J., Benoit JB., Stowasser A, Tomoyasu Y., Buschbeck EK."
+authors: "Mitra AT., Rathore S., Jester A., Hyland-Brown R., Hassert J., Benoit JB., Stowasser A., Buschbeck EK."
 date: "7 April 2024"
 output:
   html_document:
