@@ -101,7 +101,7 @@ qPCR_plot
 # Figure 2
 ```{r figure 2: qPCR }
 
-pdf(file = "Figures/qPCR.pdf", width = 9,  height = 6)
+pdf(file = "Figures/figure_2.pdf", width = 9,  height = 6)
 qPCR_plot
 dev.off()
 
@@ -1966,7 +1966,7 @@ behaviour_final <- ggdraw() +
   draw_image(image = larva_v_icon, x = 0.41, y =  -0.39, scale = 0.13) +
   # bright, dim & uv light vectors
   draw_image(image = bright_icon, x = -0.27, y =  0.465, scale = 0.083) +
-  draw_image(image = dim_icon, x = 0.165, y =  0.457, scale = 0.055) +
+  draw_image(image = dim_icon, x = 0.165, y =  0.457, scale = 0.075) +
   draw_image(image = uv_icon, x = -0.18, y = 0.466, scale = 0.083) +
   # labels for photon count
   draw_label(label = expression(bold("6.27 - 7.03 x 10"^"14"*" photons/cm"^"2"*"/s")),
@@ -2287,7 +2287,7 @@ spec_figure_final<- ggdraw() +
     # bright & dim light vectors
     draw_image(image = bright_icon, x = 0.47, y =  0.3, scale = 0.083) +
     draw_image(image = uv_icon, x = 0.47, y = 0.20, scale = 0.083) + 
-    draw_image(image = dim_icon, x = 0.47, y =  -0.2, scale = 0.065) +
+    draw_image(image = dim_icon, x = 0.47, y =  -0.2, scale = 0.075) +
     # horizontal larva silhouettes
     draw_image(image = larva_h_icon_rotate, x = -0.19, y =  0.45, scale = 0.13) +
     draw_image(image = larva_v_icon, x = 0.25, y =  0.441, scale = 0.13)
