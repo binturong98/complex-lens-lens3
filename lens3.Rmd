@@ -98,6 +98,7 @@ qPCR_plot <- qpcr_data %>%
 qPCR_plot
 ```
 
+# Figure 2
 ```{r figure 2: qPCR }
 
 pdf(file = "Figures/qPCR.pdf", width = 9,  height = 6)
@@ -451,6 +452,7 @@ RE2_focal
 
 ```
 
+# Figure 3
 ```{r figure 3: sharpness curve & maximum sharpness & focal length}
 
 # making individual panels 
@@ -501,6 +503,7 @@ dev.off()
 
 ```
 
+# Figure S1
 ```{r figure S1: hanging drops}
 
 ###### edge sharpness curves - row 1 ######
@@ -872,6 +875,7 @@ E2_LR_oph
 
 ```
 
+# Figure 6
 ```{r figure 6: ophthalmoscope}
 
 # Make panels 
@@ -1142,6 +1146,7 @@ E2_LR_249_oph_plot
 
 ```
 
+# Figure S2
 ```{r figure S2: ophthalmoscope left right asymmetry}
 
 # Making panels
@@ -1808,6 +1813,7 @@ dark_latency_vertical_pooled <- behaviour_data %>%
 dark_latency_vertical_pooled
 ```
 
+# Figure 7
 ```{r figure 7: behaviour}
 
 #make latency panels 
@@ -1919,7 +1925,9 @@ y.grob.hunting <- textGrob("% Hunting success",
 
 hunting_plot_axis <- grid.arrange(arrangeGrob(hunting_plot, left = y.grob.hunting)) # adding common y axis
 
-behaviour_plots <- grid.arrange(arrangeGrob(latency_plot_axis, hunting_plot_axis, nrow = 2))
+behaviour_plots <- grid.arrange(arrangeGrob(latency_plot_axis, hunting_plot_axis, 
+                                            nrow = 2,
+                                            heights = c(6.5, 6)))
 
 plot_grid(behaviour_plots)
 
@@ -1933,7 +1941,7 @@ behaviour_figure <- plot_grid(NULL, behaviour_plots, NULL,
 
 # adding a row for the light arena icons
 behaviour_figure <- plot_grid(NULL, behaviour_figure,
-                  rel_heights = c(0.5, 6),
+                  rel_heights = c(0.9, 6),
                   nrow = 2)
 
 plot_grid(behaviour_figure)
@@ -1943,24 +1951,35 @@ larva_h_icon <- "larva_horizontal.png"
 larva_v_icon <- "larva_vertical.png"
 bright_icon <- "bright_light.png"
 dim_icon <- "dim_light.png"
+uv_icon <- "uv_light.png"
+
+bright_label <- expression("Absolute spectral irradiance (µW/cm"^2*"/nm)")
 
 # drawing icons onto the final figure
 behaviour_final <- ggdraw() +
   draw_plot(behaviour_figure) +
   # horizontal larva silhouettes
-  draw_image(image = larva_h_icon, x = 0.41, y =  0.35, scale = 0.13) +
-  draw_image(image = larva_h_icon, x = 0.41, y =  -0.11, scale = 0.13) +
+  draw_image(image = larva_h_icon, x = 0.41, y =  0.28, scale = 0.13) +
+  draw_image(image = larva_h_icon, x = 0.41, y =  -0.17, scale = 0.13) +
   # vertical larva silhouettes
-  draw_image(image = larva_v_icon, x = 0.41, y =  0.11, scale = 0.13) +
-  draw_image(image = larva_v_icon, x = 0.41, y =  -0.35, scale = 0.13) +
-  # bright & dim light vectors
-  draw_image(image = bright_icon, x = -0.2405, y =  0.45, scale = 0.083) +
-  draw_image(image = dim_icon, x = 0.165, y =  0.441, scale = 0.065)
+  draw_image(image = larva_v_icon, x = 0.41, y =  0.045, scale = 0.13) +
+  draw_image(image = larva_v_icon, x = 0.41, y =  -0.39, scale = 0.13) +
+  # bright, dim & uv light vectors
+  draw_image(image = bright_icon, x = -0.27, y =  0.465, scale = 0.083) +
+  draw_image(image = dim_icon, x = 0.165, y =  0.457, scale = 0.055) +
+  draw_image(image = uv_icon, x = -0.18, y = 0.466, scale = 0.083) +
+  # labels for photon count
+  draw_label(label = expression(bold("6.27 - 7.03 x 10"^"14"*" photons/cm"^"2"*"/s")),
+             x = 0.27, y = 0.9,
+             size = 20) +
+  draw_label(label = expression(bold("9.29 x 10"^"12"*" photons/cm"^"2"*"/s")),
+             x = 0.67, y = 0.9,
+             size = 20)
 
 behaviour_final
 
 # print graph
-pdf(file = "Figures/figure_7.pdf", width = 15,  height = 16)
+pdf(file = "Figures/figure_7.pdf", width = 15,  height = 18)
 behaviour_final
 dev.off()
 
@@ -2201,6 +2220,7 @@ vertical_dark_spec_colour <- ver_dark_spec_df %>% # plotting extracted values
 vertical_dark_spec_colour
 ```
 
+#Figure S3
 ```{r figure S3: spectra}
 
 # Making panels
@@ -2265,7 +2285,8 @@ larva_h_icon_rotate <- image_rotate(larva_icon_magick, 270)
 spec_figure_final<- ggdraw() +
   draw_plot(spec_figure_margins) +
     # bright & dim light vectors
-    draw_image(image = bright_icon, x = 0.47, y =  0.26, scale = 0.083) +
+    draw_image(image = bright_icon, x = 0.47, y =  0.3, scale = 0.083) +
+    draw_image(image = uv_icon, x = 0.47, y = 0.20, scale = 0.083) + 
     draw_image(image = dim_icon, x = 0.47, y =  -0.2, scale = 0.065) +
     # horizontal larva silhouettes
     draw_image(image = larva_h_icon_rotate, x = -0.19, y =  0.45, scale = 0.13) +
