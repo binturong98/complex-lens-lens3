@@ -2254,7 +2254,7 @@ spec_figure <- plot_grid(fig.a, fig.b, fig.c, fig.d,
 spec_figure
 
 # Creating common axis labels
-y.grob <- textGrob(label= expression(bold("Absolute spectral irradiance (µW/cm"^2*"/nm)")), 
+y.grob <- textGrob(label= expression(bold("Absolute spectral irradiance (µW/cm"^"2"*"/nm)")), 
                    gp = gpar(fontsize = 25), rot = 90, 
                              vjust = 0.8,
                              hjust = 0.5)
@@ -2263,7 +2263,6 @@ x.grob <- textGrob("Wavelength (nm)",
                    gp = gpar(fontface = "bold",
                              fontsize = 25),
                              vjust = -0.3)
-
 
 # adding common x axis label
 spec_figure_xlab <- plot_grid(spec_figure, x.grob,
