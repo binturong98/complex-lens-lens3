@@ -1,5 +1,5 @@
 ---
-title: "Cataract induction in an arthropod reveals how lens crystallins contribute to the formation of ‘biological glass"
+title: "Cataract induction in an arthropod reveals how lens crystallins contribute to the formation of biological glass"
 authors: "Mitra AT., Rathore S., Jester A., Hyland-Brown R., Hassert J., Benoit JB., Stowasser A., Buschbeck EK."
 date: "18 October 2024"
 output:
